@@ -76,7 +76,7 @@ fig = plot.figure();
 axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-10, 10), ylim=(-10, 10))
 
 line1, = axes.plot([], [], "o-g", lw=2); # A green planet
-line2, = axes.plot([], [], "o-b", lw=2), # A blue planet
+line2, = axes.plot([], [], "o-b", lw=2); # A blue planet
 line3, = axes.plot([], [], "o-r", lw=2); # A red planet
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
 
