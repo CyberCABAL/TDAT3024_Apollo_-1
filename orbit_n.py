@@ -21,15 +21,6 @@ init = np.array([
     np.array([-0.433, -0.433, 0.866])]);
 
 class Orbit:
-    """
-    
-    Orbit Class
-
-    init_state is [t0,x0,vx0,y0,vx0],
-    where (x0,y0) is the initial position
-    , (vx0,vy0) is the initial velocity
-    and t0 is the initial time
-    """
     def __init__(self,
                  init_state = [[0], [0, 1, 2], [0, 1, 2], [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
                  G=1,
