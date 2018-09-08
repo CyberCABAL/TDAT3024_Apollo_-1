@@ -33,7 +33,6 @@ class RungeKuttaFehlberg54:
     def step(self, W_in):
         s = np.zeros((6, self.dim));
 
-        #print(s);
         for i in range(0, 6):
             s[i, :] = self.F(W_in + self.h * self.A[i, 0:i].dot(s[0:i, :]));
 
@@ -89,12 +88,18 @@ class RungeKuttaFehlberg54:
     res[0:3] = M.dot(Y[0:3]);
     return res;"""
 
-def F(Y):   # it doesn't work currently
+def F(Y):
     M = np.array([[1, 1],
                 [-1, 1]]);
-    res = np.ones(2);
-    res[0:2] = M.dot(Y[0:2]);
+    res = np.ones(3);
+    res[1:3] = M.dot(Y[1:3]);
     return res;
+
+def y_1(t):
+    return m.e**t * m.cos(t);
+
+def y_2(t):
+    return -m.e**t * m.sin(t);
 
 def main():
     """ 6.3.1.a
@@ -106,11 +111,11 @@ def main():
 
     y_1(t) = e**t * cos(t), y_2(t) = -e**t * sin(t)
     """
-    W = np.array([1, 0]);
+    W = np.array([0, 1, 0]);
     h = 0.25;
     tol = 05e-14;
     tEnd = 1.0;
-    rkf54 = RungeKuttaFehlberg54(F, 2, h, tol);
+    rkf54 = RungeKuttaFehlberg54(F, 3, h, tol);
 
     while(W[0] < tEnd):
         W, E = rkf54.safeStep(W);
@@ -119,6 +124,8 @@ def main():
     W, E = rkf54.step(W);
 
     print(W, E);
+    
+    print("Total error: ", [abs(W[1] - y_1(1)), abs(W[2] - y_2(1))]);
     
 if __name__ == "__main__":
     # execute only if run as a script
