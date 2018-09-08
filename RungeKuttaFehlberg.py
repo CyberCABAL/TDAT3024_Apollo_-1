@@ -20,8 +20,8 @@ class RungeKuttaFehlberg54:
          [  -8/27  ,     2     , -3544/2565 , 1859/4104, -11/40, 0]]);
   
     B = np.array(
-        [[  25/216,    0     ,1408/2565 ,  2197/4104 , -1/5 , 0],
-         [  16/135,    0     ,6656/12825, 28561/56430, -9/50, 2/55]]);
+        [[  25/216,    0     , 1408/2565 ,  2197/4104 , -1/5 , 0],
+         [  16/135,    0     , 6656/12825, 28561/56430, -9/50, 2/55]]);
 
     def __init__(self, function, dimension,
                  stepsize, tolerance):
@@ -32,7 +32,8 @@ class RungeKuttaFehlberg54:
     
     def step(self, W_in):
         s = np.zeros((6, self.dim));
-        
+
+        #print(s);
         for i in range(0, 6):
             s[i, :] = self.F(W_in + self.h * self.A[i, 0:i].dot(s[0:i, :]));
 
@@ -80,20 +81,36 @@ class RungeKuttaFehlberg54:
     def setStepLength(self, stepLength):
         self.h = stepLength;        
         
-def F(Y):
+"""def F(Y):
     M = np.array([[0.49119653, 0.32513304, 0.98057799],
                 [0.20768544, 0.97699416, 0.18220559],
                 [0.96407071, 0.18373237, 0.95307793]]);
-    res = np.ones(4);               
-    res[1:4] = M.dot(Y[1:4]);
+    res = np.ones(4);
+    res[0:3] = M.dot(Y[0:3]);
+    return res;"""
+
+def F(Y):   # it doesn't work currently
+    M = np.array([[1, 1],
+                [-1, 1]]);
+    res = np.ones(2);
+    res[0:2] = M.dot(Y[0:2]);
     return res;
 
 def main():
-    W = np.array([0, 1, 1, 1]);
-    h = 0.1;
+    """ 6.3.1.a
+    h = 0.25, [0,1]
+    y'1 = y_1 + y_2
+    y'2 = −y_1 + y_2
+    y_1(0) = 1
+    y_2(0) = 0
+
+    y_1(t) = e**t * cos(t), y_2(t) = -e**t * sin(t)
+    """
+    W = np.array([1, 0]);
+    h = 0.25;
     tol = 05e-14;
-    tEnd = 2.0;
-    rkf54 = RungeKuttaFehlberg54(F, 4, h, tol);
+    tEnd = 1.0;
+    rkf54 = RungeKuttaFehlberg54(F, 2, h, tol);
 
     while(W[0] < tEnd):
         W, E = rkf54.safeStep(W);
