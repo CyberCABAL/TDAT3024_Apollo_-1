@@ -1,29 +1,94 @@
-totalmasse=2970*10**3
+'''
+Saturn V info: 
+Totalvekt:  2970000  kg
 
-#steg 1
-F1=35100*10**3
-tid1=168
-tørrvekt1=130*10**3
-totalvekt1=2290*10**3
-drivstoffvekt1=totalvekt1-tørrvekt1
-ms1=-(drivstoffvekt1/tid1)
-v1=F1/-ms1
+Steg:  1 
+Totalvekt:  2290000  kg 
+Vekt uten drivstoff:  130000  kg 
+Drivstoff i kg:  2160000  kg 
+Masseendring:  -12857.142857142857  kg/s 
+Hastighet:  2730.0  m/s
 
-#steg 2
-F2=5141*10**3
-tid2=360
-tørrvekt2=40.1*10**3
-totalvekt2=496.2*10**3
-drivstoffvekt2=totalvekt2-tørrvekt2
-ms2=-(drivstoffvekt2/tid2)
-v2=F2/-ms2
+Steg:  2 
+Totalvekt:  496200.0  kg 
+Vekt uten drivstoff:  40100.0  kg 
+Drivstoff i kg:  456100.0  kg 
+Masseendring:  -1266.9444444444443  kg/s 
+Hastighet:  4057.7943433457576  m/s
 
-#steg 3
-F3=1000*10**3
-tid3=165+335 #2 burns
-tørrvekt3=13.5*10**3
-totalvekt3=123*10**3
-drivstoffvekt3=totalvekt3-tørrvekt3
-ms3=-(drivstoffvekt3/tid3)
-v3=F3/-ms3
+Steg:  3 
+Totalvekt:  123000  kg 
+Vekt uten drivstoff:  13500.0  kg 
+Drivstoff i kg:  109500.0  kg 
+Masseendring:  -219.0  kg/s 
+Hastighet:  4566.2100456621  m/s
+'''
 
+#BTW så e d bare å endre variabelnavn og metodenavn
+class Saturn_V:
+    def __init__(self,
+               totmasse = 2970*10**3,
+               stegtotmasse = [2290*10**3, 496.2*10**3, 123*10**3],
+               stegtorrmasse = [130*10**3, 40.1*10**3, 13.5*10**3],
+               stegskyvekraft = [35100*10**3, 5141*10**3, 1000*10**3],
+               stegtid = [168, 360, 500]):
+        self.m = totmasse;
+        self.stegM = stegtotmasse;
+        self.stegTorrM = stegtorrmasse;
+        self.stegF = stegskyvekraft;
+        self.stegT = stegtid;
+
+    def getDrivstoff(self, x):
+        return self.stegM[x]-self.stegTorrM[x]
+
+    def getMasseEndring(self, x):
+        return -(self.getDrivstoff(x)/self.stegT[x])
+
+    def getV(self,x):
+        return self.stegF[x]/-(self.getMasseEndring(x))
+
+    def stegInfo(self, stegNr):
+         steg=stegNr-1
+         print("Steg: ", stegNr, "\nTotalvekt: ", self.stegM[steg], " kg",
+               "\nVekt uten drivstoff: ", self.stegTorrM[steg], " kg",
+               "\nDrivstoff i kg: ", self.getDrivstoff(steg), " kg",
+               "\nMasseendring: ", self.getMasseEndring(steg), " kg/s",
+               "\nHastighet: ", self.getV(steg), " m/s")
+
+    def saturn_vInfo(self):
+        print("Saturn V info:", "\nTotalvekt: ", self.m, " kg")
+        for i in range(3):
+            print("\n")
+            self.stegInfo(i+1)
+
+    def getStegStartMasse(self,x):
+        if(x<3 and x>=0):
+            if(x==0):
+                return self.m
+            if(x==1):
+                return self.m-self.stegM[0]
+            else:
+                return self.m-self.stegM[0]-self.stegM[1]
+            
+    def mt(self, t):
+        if(t>=0 and t<=1028):
+            
+            if(t<=168):
+                return self.getStegStartMasse(0)+self.getMasseEndring(0)*t
+            if(t>168 and t<=528):
+                st=t-168
+                return self.getStegStartMasse(1)+self.getMasseEndring(1)*st
+            else:
+                st=t-168-360
+                return self.getStegStartMasse(2)+self.getMasseEndring(2)*st
+        else:
+            if(t>1028):
+                return self.m-self.stegM[0]-self.stegM[1]-self.stegM[2]
+            else:
+                raise ValueError('velg en t i intervallet [0,->]')
+
+    def skyvekraft(self, t):
+        return
+
+saturnv = Saturn_V();
+print(saturnv.mt(300))
