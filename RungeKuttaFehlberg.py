@@ -149,21 +149,25 @@ def tid(tol):
     rkf54.setStepLength(tEnd - W[0]);
     W, E = rkf54.step(W);
     return W, E
-    
-if __name__ == "__main__":
-    # execute only if run as a script
-    main();
 
-
-    ekspo = np.arange(0,20,1)
+def tidplot():
+    ekspo = np.arange(0, 20, 1)
     tiden = np.ones(20)
 
     for i in range(20):
-        tol = 1 * 10**-i
-        tiden[i] = timeit.timeit('tid({})'.format(tol), 'from __main__ import tid', number = 10)/10;
+        tol = 1 * 10 ** -i
+        tiden[i] = timeit.timeit('tid({})'.format(tol), 'from __main__ import tid', number=10) / 10;
         # print('Toleranse: {}\t Tid: {}'.format(tol,tiden[i]));
 
     plt.plot(ekspo, tiden, 'b-')
     plt.ylabel('Tid per rkf45 (s)')
     plt.xlabel('Toleransens eksponent (10^-x)')
     plt.show()
+    
+if __name__ == "__main__":
+    # execute only if run as a script
+    main();
+    tidplot();
+
+
+
