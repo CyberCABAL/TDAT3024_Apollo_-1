@@ -78,4 +78,6 @@ if __name__ == "__main__":
         pressure[i]= p_air(x[i])/10000 #unit = 10kPa
         density[i]= ρ_atmos(pressure[i], temp[i])
     plt.plot(x,pressure,'b-', x,temp,'r-', x,density,'y-');
+    plt.ylabel('Temp (100K) - Trykk (10kPa) - Tetthet(100g/m3)')
+    plt.xlabel('Høyde (m)')
     plt.show()
