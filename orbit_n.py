@@ -6,16 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 
-#G = 6.67408 * 10**(-11);	# Real G
-G = 1.0;
-m = np.array([1, 1, 1]);
-init = np.array([
-    np.array([0.0]),
-    np.array([-0.970, 0.970, 0.0]),
-    np.array([0.243, -0.243, 0.0]),
-    np.array([-0.466, -0.466, 0.932]),
-    np.array([-0.433, -0.433, 0.866])]);
-
 class Orbit:
     def __init__(self,
                  init_state = [[0], [0, 1, 2], [0, 1, 2], [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],

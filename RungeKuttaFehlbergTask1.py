@@ -79,8 +79,38 @@ class RungeKuttaFehlberg54:
         
     def setStepLength(self, stepLength):
         self.h = stepLength;        
-     
-"""def main():
+        
+"""def F(Y):
+    M = np.array([[0.49119653, 0.32513304, 0.98057799],
+                [0.20768544, 0.97699416, 0.18220559],
+                [0.96407071, 0.18373237, 0.95307793]]);
+    res = np.ones(4);
+    res[0:3] = M.dot(Y[0:3]);
+    return res;"""
+
+def F(Y):
+    M = np.array([[1, 1],
+                [-1, 1]]);
+    res = np.ones(3);
+    res[1:3] = M.dot(Y[1:3]);
+    return res;
+
+def y_1(t):
+    return m.e**t * m.cos(t);
+
+def y_2(t):
+    return -m.e**t * m.sin(t);
+
+def main():
+    """ 6.3.1.a
+    h = 0.25, [0,1]
+    y'1 = y_1 + y_2
+    y'2 = −y_1 + y_2
+    y_1(0) = 1
+    y_2(0) = 0
+
+    y_1(t) = e**t * cos(t), y_2(t) = -e**t * sin(t)
+    """
     W = np.array([0, 1, 0]);
     h = 0.25;
     tol = 05e-14;
@@ -98,4 +128,5 @@ class RungeKuttaFehlberg54:
     print("Total error: ", [abs(W[1] - y_1(1)), abs(W[2] - y_2(1))]);
     
 if __name__ == "__main__":
-    main();"""
+    # execute only if run as a script
+    main();

@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 G = 6.67408 * 10**(-11);
 
@@ -6,13 +7,15 @@ class CelestialObject:
     def __init__(self,
                  position = [0, 0, 0],
                  dirVec = [0, 0, 0],
-                 mass = 1, r = 1):
+                 mass = 1, r = 1, name = ""):
         self.mass = mass;
+        self.gm = G * mass;
         self.r = r;
-        self.position = position;
-        self.dirVec = dirVec;
+        self.position = np.array(position);
+        self.dirVec = np.array(dirVec);
+        self.name = name;
 
-# Force of gravity
+# Total force of gravity
 def F_G(x_0, x_1):
     r = dist(x_0, x_1);
     return G * x_0.mass * x_1.mass / (r * r);
