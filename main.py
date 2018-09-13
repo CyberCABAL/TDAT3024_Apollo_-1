@@ -1,14 +1,18 @@
 from fy import CelestialObject
+from orbitalsys import System
 from RungeKuttaFehlberg import RungeKuttaFehlberg54
 
 import numpy as np
 import time
 import matplotlib.pyplot as plot
 import matplotlib.animation as animation
+import matplotlib.patches as patch
+
+Terra = CelestialObject([0, 0, 0], [0, 0, 0], 59722 * 10**20, 6378100, "Terra");
+Luna = CelestialObject([362600.0, 0, 0], [0, 1078.2, 0], 734767309 * 10**14, 1737000, "Luna");
+sys = System([Terra, Luna]);
 
 def main():
-    Terra = CelestialObject([0, 0, 0], [0, 0, 0], 59722 * 10**20, 6378100, "Terra");
-    Luna = CelestialObject([362600.0, 0, 0], [0, 1078.2, 0], 734767309 * 10**14, 1737000, "Luna");
     dt = 1./30 # 30 frames per second
 
     W = np.array([0, 1, 0]);
@@ -30,11 +34,12 @@ def main():
 
     # The figure is set
     fig = plot.figure();
-    axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-Luna.position[0] + 1000, Luna.position[0] - 1000), ylim=(-Luna.position[0] + 1000, Luna.position[0] - 1000))
-
+    axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-Luna.position[0] - 50000, Luna.position[0] + 50000), ylim=(-Luna.position[0] - 50000, Luna.position[0] + 50000))
+    
     line1, = axes.plot([], [], "o-b", lw=2); # Terra
     line2, = axes.plot([], [], "o-k", lw=2); # Luna
     time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
+    
 
     def init():
         #initialize animation
@@ -45,12 +50,12 @@ def main():
 
     def animate(i):
         #perform animation step
-        global dt, rkf54, Terra, Luna;
+        global dt, rkf54, Terra, Luna, sys;
         #for j in range(10):
             #rkf54.safeStep(dt);
-        line1.set_data(*Terra.position);
-        line2.set_data(*Luna.position);
-        #time_text.set_text('time = %.1f' % W[0]);
+        line1.set_data(*Terra.position[0:2]);
+        line2.set_data(*Luna.position[0:2]);
+        time_text.set_text('time = %.1f' % sys.time_elapsed());
         return line1, line2, time_text;
 
     # choose the interval based on dt and the time to animate one step

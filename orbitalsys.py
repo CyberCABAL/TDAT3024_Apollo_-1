@@ -12,18 +12,23 @@ class System:
                  G = 6.67408 * 10**(-11), t = 0):
         self.GravConst = G;
         self.objects = objects;
-        objectsToState();
+        n = len(objects);
+        dim = len(objects[0].position);
+        self.state = np.array([[t],
+                               [[objects[i].position[j] for i in range(n)] for j in range(dim)],
+                               [[objects[i].dirVec[j] for i in range(n)] for j in range(dim)],
+                               ]);
 
     def time_elapsed(self):
         return self.state[0][0];
 
     def objectsToState(self):
         n = len(objects);
-        dim = len(planets[0].position);
+        dim = len(objects[0].position);
         self.state = np.array([[t],
                                [[objects[i].position[j] for i in range(n)] for j in range(dim)],
                                [[objects[i].dirVec[j] for i in range(n)] for j in range(dim)],
-                               );
+                               ]);
 
     def stateToObjects(self):
         for i in range(len(objects)):
