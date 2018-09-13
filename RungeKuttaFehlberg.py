@@ -9,6 +9,8 @@ Created on Thu Aug 30 20:26:05 2018
 import numpy as np
 import math as m 
 import sys
+import timeit
+import matplotlib.pyplot as plt
 
 class RungeKuttaFehlberg54:
     A = np.array(
@@ -94,6 +96,13 @@ def F(Y):
     res = np.ones(3);
     res[1:3] = M.dot(Y[1:3]);
     return res;
+def F_test(Y):
+    M = np.array([[0.49119653, 0.32513304, 0.98057799],
+                [0.20768544, 0.97699416, 0.18220559],
+                [0.96407071, 0.18373237, 0.95307793]]);
+    res = np.ones(4);
+    res[1:4] = M.dot(Y[1:4]);
+    return res;
 
 def y_1(t):
     return m.e**t * m.cos(t);
@@ -103,30 +112,62 @@ def y_2(t):
 
 def main():
     """ 6.3.1.a
-    h = 0.25, [0,1]
-    y'1 = y_1 + y_2
-    y'2 = −y_1 + y_2
-    y_1(0) = 1
-    y_2(0) = 0
+      h = 0.25, [0,1]
+      y'1 = y_1 + y_2
+      y'2 = −y_1 + y_2
+      y_1(0) = 1
+      y_2(0) = 0
 
-    y_1(t) = e**t * cos(t), y_2(t) = -e**t * sin(t)
-    """
+      y_1(t) = e**t * cos(t), y_2(t) = -e**t * sin(t)
+      """
+
     W = np.array([0, 1, 0]);
+    E = 0;
     h = 0.25;
     tol = 05e-14;
     tEnd = 1.0;
-    rkf54 = RungeKuttaFehlberg54(F, 3, h, tol);
 
-    while(W[0] < tEnd):
+    rkf54 = RungeKuttaFehlberg54(F, 3, h, tol);
+    while (W[0] < tEnd):
         W, E = rkf54.safeStep(W);
-        
+
     rkf54.setStepLength(tEnd - W[0]);
     W, E = rkf54.step(W);
 
     print(W, E);
-    
     print("Total error: ", [abs(W[1] - y_1(1)), abs(W[2] - y_2(1))]);
+
+def tid(tol):
+    W = np.array([0, 1, 1, 1]);
+    h = 0.1;
+    tEnd = 2.0;
+    rkf54 = RungeKuttaFehlberg54(F_test, 4, h, tol);
+
+    while (W[0] < tEnd):
+        W, E = rkf54.safeStep(W);
+
+    rkf54.setStepLength(tEnd - W[0]);
+    W, E = rkf54.step(W);
+    return W, E
+
+def tidplot():
+    ekspo = np.arange(0, 20, 1)
+    tiden = np.ones(20)
+
+    for i in range(20):
+        tol = 1 * 10 ** -i
+        tiden[i] = timeit.timeit('tid({})'.format(tol), 'from __main__ import tid', number=10) / 10;
+        # print('Toleranse: {}\t Tid: {}'.format(tol,tiden[i]));
+
+    plt.plot(ekspo, tiden, 'b-')
+    plt.ylabel('Tid per rkf45 (s)')
+    plt.xlabel('Toleransens eksponent (10^-x)')
+    plt.show()
     
 if __name__ == "__main__":
     # execute only if run as a script
     main();
+    tidplot();
+
+
+

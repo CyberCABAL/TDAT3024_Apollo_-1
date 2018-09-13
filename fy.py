@@ -1,4 +1,6 @@
 import math
+import numpy as np
+import matplotlib.pyplot as plt
 
 G = 6.67408 * 10**(-11);
 
@@ -42,9 +44,10 @@ def T(h):
         T_a = 288.19;
         T_b = -0.00649;
     elif (h < 25000):
-        return 216.69;
-    else:
-        T_a = 141,94;
+        T_a = 216.69
+        T_b = 0
+    elif (h >= 25000):
+        T_a = 141.94;
         T_b = 0.00299;
     return T_a + T_b * h;
 
@@ -64,3 +67,17 @@ def p_air(h):
         p_b = 216.6;
         exp = -11.388;
     return p_a * math.pow(T(h) / p_b, exp);
+
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    x = np.arange(0,50000,5000)
+    pressure, temp, density = np.ones(10), np.ones(10), np.ones(10)
+    for i in range(10):
+        temp[i]= T(x[i])/100 #unit = 100K
+        pressure[i]= p_air(x[i])/10000 #unit = 10kPa
+        density[i]= ρ_atmos(pressure[i], temp[i])
+    plt.plot(x,pressure,'b-', x,temp,'r-', x,density,'y-');
+    plt.ylabel('Temp (100K) - Trykk (10kPa) - Tetthet(100g/m3)')
+    plt.xlabel('Høyde (m)')
+    plt.show()
