@@ -8,6 +8,7 @@ Vekt uten drivstoff:  130000  kg
 Drivstoff i kg:  2160000  kg 
 Masseendring:  -12857.142857142857  kg/s 
 Hastighet:  2730.0  m/s
+Skyvekraft:  35100000  N
 
 Steg:  2 
 Totalvekt:  496200.0  kg 
@@ -15,6 +16,7 @@ Vekt uten drivstoff:  40100.0  kg
 Drivstoff i kg:  456100.0  kg 
 Masseendring:  -1266.9444444444443  kg/s 
 Hastighet:  4057.7943433457576  m/s
+Skyvekraft:  5141000  N
 
 Steg:  3 
 Totalvekt:  123000  kg 
@@ -22,6 +24,7 @@ Vekt uten drivstoff:  13500.0  kg
 Drivstoff i kg:  109500.0  kg 
 Masseendring:  -219.0  kg/s 
 Hastighet:  4566.2100456621  m/s
+Skyvekraft:  1000000  N
 '''
 
 #BTW så e d bare å endre variabelnavn og metodenavn
@@ -53,7 +56,8 @@ class Saturn_V:
                "\nVekt uten drivstoff: ", self.stegTorrM[steg], " kg",
                "\nDrivstoff i kg: ", self.getDrivstoff(steg), " kg",
                "\nMasseendring: ", self.getMasseEndring(steg), " kg/s",
-               "\nHastighet: ", self.getV(steg), " m/s")
+               "\nHastighet: ", self.getV(steg), " m/s",
+               "\nSkyvekraft: ", self.stegF[steg], " N")
 
     def saturn_vInfo(self):
         print("Saturn V info:", "\nTotalvekt: ", self.m, " kg")
@@ -88,7 +92,21 @@ class Saturn_V:
                 raise ValueError('velg en t i intervallet [0,->]')
 
     def skyvekraft(self, t):
-        return
+        if(t>=0 and t<=1028):
+            if(t<=168):
+                return self.stegF[0]
+            if(t>168 and t<=528):
+                return self.stegF[1]
+            else:
+                return self.stegF[2]
+        else:
+            if(t>1028):
+                return 0
+            else:
+                raise ValueError('velg en t i intervallet [0, ->]')
+        
 
 saturnv = Saturn_V();
 print(saturnv.mt(300))
+print(saturnv.skyvekraft(300))
+
