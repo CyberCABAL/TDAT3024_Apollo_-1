@@ -3,8 +3,6 @@ import time
 
 import numpy as np
 
-from RungeKuttaFehlberg import RungeKuttaFehlberg54
-
 import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 
@@ -99,9 +97,6 @@ animate(0);
 t1 = time.time();
 
 delay = 1000 * dt - (t1 - t0);
-
-tol = 05e-14;
-rkf54 = RungeKuttaFehlberg54(F, 3, dt, tol);
 
 anim=animation.FuncAnimation(fig,        # figure to plot in
                         animate,    # function that is called on each frame

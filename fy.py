@@ -22,12 +22,13 @@ def F_G(x_0, x_1):
 
 # Distance between two objects
 def dist(x_0, x_1):
-    p0 = x_0.position, p1 = x_1.position;
+    p0 = x_0.position;
+    p1 = x_1.position;
     delta = [p0[i] - p1[i] for i in range(len(p0))];
     distSum = 0;
     for i in range(len(p0)):
         distSum += delta[i] * delta[i];
-    return sqrt(distSum);
+    return math.sqrt(distSum);
 
 # Force of drag
 def F_d(C_d, p_air, A, v):

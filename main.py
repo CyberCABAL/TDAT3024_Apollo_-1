@@ -8,33 +8,26 @@ import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 import matplotlib.patches as patch
 
-Terra = CelestialObject([0, 0, 0], [0, 0, 0], 59722 * 10**20, 6378100, "Terra");
-Luna = CelestialObject([362600.0, 0, 0], [0, 1078.2, 0], 734767309 * 10**14, 1737000, "Luna");
-sys = System([Terra, Luna]);
+sys = System([CelestialObject([0., 0., 0.], [0., 0., 0.], 59722. * 10**20, 6378100, "Terra"),
+              CelestialObject([362600., 0., 0.], [0., 1078.2, 0.], 734767309. * 10**14, 1737000, "Luna")]);
 
 def main():
     dt = 1./30 # 30 frames per second
-
-    W = np.array([0, 1, 0]);
-    #h = 0.25;
     tol = 05e-14;
-    #tEnd = 100.0;
-    #F = lambda x
-    #rkf54 = RungeKuttaFehlberg54(F, 3, h, tol);
+    sys.estimate = RungeKuttaFehlberg54(sys.ydot, sys.dim, dt, tol, sys.objLen);
 
-    #while(W[0] < tEnd):
-    #    W, E = rkf54.safeStep(W);
-        
+    #F = lambda x
+
+    #W, E = rkf54.safeStep(W);
     #rkf54.setStepLength(tEnd - W[0]);
     #W, E = rkf54.step(W);
 
     #print(W, E);
-    
     #print("Total error: ", [abs(W[1] - y_1(1)), abs(W[2] - y_2(1))]);
 
     # The figure is set
     fig = plot.figure();
-    axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-Luna.position[0] - 50000, Luna.position[0] + 50000), ylim=(-Luna.position[0] - 50000, Luna.position[0] + 50000))
+    axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-sys.objects[1].position[0] - 50000, sys.objects[1].position[0] + 50000), ylim=(-sys.objects[1].position[0] - 50000, sys.objects[1].position[0] + 50000))
     
     line1, = axes.plot([], [], "o-b", lw=2); # Terra
     line2, = axes.plot([], [], "o-k", lw=2); # Luna
@@ -50,11 +43,10 @@ def main():
 
     def animate(i):
         #perform animation step
-        global dt, rkf54, Terra, Luna, sys;
-        #for j in range(10):
-            #rkf54.safeStep(dt);
-        line1.set_data(*Terra.position[0:2]);
-        line2.set_data(*Luna.position[0:2]);
+        global sys;
+        sys.step(10);
+        line1.set_data(*sys.objects[0].position[0:2]);
+        line2.set_data(*sys.objects[1].position[0:2]);
         time_text.set_text('time = %.1f' % sys.time_elapsed());
         return line1, line2, time_text;
 

@@ -24,16 +24,23 @@ class RungeKuttaFehlberg54:
          [  16/135,    0     , 6656/12825, 28561/56430, -9/50, 2/55]]);
 
     def __init__(self, function, dimension,
-                 stepsize, tolerance):
+                 stepsize, tolerance, n):
         self.F = function;
         self.dim = dimension;
         self.h = stepsize;
         self.tol = tolerance;
+        self.n = n;
     
     def step(self, W_in):
-        s = np.zeros((6, self.dim));
+        #s = np.zeros((6, self.dim));
+        s = np.array([[np.array([0]), np.array([np.zeros(self.n) for i in range(self.dim)]), np.array([np.zeros(self.n) for i in range(self.dim)])] for j in range(6)]);
 
-        for i in range(0, 6):
+        for i in range(1, 6):
+            print(W_in, "\n");
+            print(self.A[i, 0:i].dot(s[0:i, :]), "\n");
+            print(self.A[i, 0:i], "\n");
+            print(s[0:i, :], "\n");
+            print(W_in + self.h * self.A[i, 0:i].dot(s[0:i, :]));
             s[i, :] = self.F(W_in + self.h * self.A[i, 0:i].dot(s[0:i, :]));
 
         Z_out = W_in + self.h * (self.B[0, :].dot(s));
@@ -78,24 +85,5 @@ class RungeKuttaFehlberg54:
         self.h = self.h / 2;
         
     def setStepLength(self, stepLength):
-        self.h = stepLength;        
-     
-"""def main():
-    W = np.array([0, 1, 0]);
-    h = 0.25;
-    tol = 05e-14;
-    tEnd = 1.0;
-    rkf54 = RungeKuttaFehlberg54(F, 3, h, tol);
+        self.h = stepLength;
 
-    while(W[0] < tEnd):
-        W, E = rkf54.safeStep(W);
-        
-    rkf54.setStepLength(tEnd - W[0]);
-    W, E = rkf54.step(W);
-
-    print(W, E);
-    
-    print("Total error: ", [abs(W[1] - y_1(1)), abs(W[2] - y_2(1))]);
-    
-if __name__ == "__main__":
-    main();"""
