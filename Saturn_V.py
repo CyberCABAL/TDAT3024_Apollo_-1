@@ -131,5 +131,5 @@ class Saturn_V:
 saturnv = Saturn_V();
 #saturnv.saturn_vInfo()
 print(saturnv.mt(300))
-print(saturnv.skyvekraft(600))
+#print(saturnv.skyvekraft(600))
 
