@@ -19,7 +19,7 @@ Hastighet:  4057.7943433457576  m/s
 Skyvekraft:  5141000  N
 
 Steg:  3 
-Totalvekt:  123000  kg 
+Totalvekt:  123000  kg
 Vekt uten drivstoff:  13500.0  kg 
 Drivstoff i kg:  109500.0  kg 
 Masseendring:  -219.0  kg/s 
@@ -29,6 +29,18 @@ Skyvekraft:  1000000  N
 
 #BTW så e d bare å endre variabelnavn og metodenavn
 class Saturn_V:
+    '''
+    class Saturn_V(self, totmasse, stegtotmasse, stegtorrmasse,
+        stegskyvekraft, stegtid)
+    totmasse: Den totale massen til raketten
+    stegtotmasse: En tabell med total masse for hvert steg
+    stegtorrmasse: En tabell med massen til hvert steg uten drivstoff
+    stegskyvekraft: En tabell med skyvekraften i hvert steg
+    stegtid: En tabell med tiden hvert steg tar
+
+    standardverdiene som er lagt inn i konstruktøren er hentet fra
+    https://en.wikipedia.org/wiki/Saturn_V
+    '''
     def __init__(self,
                totmasse = 2970*10**3,
                stegtotmasse = [2290*10**3, 496.2*10**3, 123*10**3],
@@ -42,12 +54,15 @@ class Saturn_V:
         self.stegT = stegtid;
 
     def getDrivstoff(self, x):
+        '''Finner hvor mye drivstoff et steg har i kg'''
         return self.stegM[x]-self.stegTorrM[x]
 
     def getMasseEndring(self, x):
+        '''Finner masseendringen til et steg i kg/s'''
         return -(self.getDrivstoff(x)/self.stegT[x])
 
     def getV(self,x):
+        '''Estimerer hastigheten til eksosgassene i hvert trinn'''
         return self.stegF[x]/-(self.getMasseEndring(x))
 
     def stegInfo(self, stegNr):
@@ -66,6 +81,7 @@ class Saturn_V:
             self.stegInfo(i+1)
 
     def getStegStartMasse(self,x):
+        '''finner totalmassen til raketten rett før hver trinn tennes'''
         if(x<3 and x>=0):
             if(x==0):
                 return self.m
@@ -75,6 +91,8 @@ class Saturn_V:
                 return self.m-self.stegM[0]-self.stegM[1]
             
     def mt(self, t):
+        '''En funksjon m(t) som gir massen til raketten ved
+        tiden t sekunder etter oppskytingen'''
         if(t>=0 and t<=1028):
             
             if(t<=168):
@@ -92,6 +110,10 @@ class Saturn_V:
                 raise ValueError('velg en t i intervallet [0,->]')
 
     def skyvekraft(self, t):
+        '''En funksjon som gir skyvekraften til raketten ved
+        tiden t sekunder etter oppskytingen, siden vi antar
+        at skyvekraften er konstant i hvert steg, så
+        sjekker metoden bare hvilket steg det er snakk om'''
         if(t>=0 and t<=1028):
             if(t<=168):
                 return self.stegF[0]
@@ -107,6 +129,7 @@ class Saturn_V:
         
 
 saturnv = Saturn_V();
+#saturnv.saturn_vInfo()
 print(saturnv.mt(300))
-print(saturnv.skyvekraft(300))
+print(saturnv.skyvekraft(600))
 
