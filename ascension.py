@@ -2,6 +2,7 @@ import time
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
 import numpy as np
+from SaturnV import SaturnV
 from RungeKuttaFehlberg import RungeKuttaFehlberg54
 
 
@@ -13,31 +14,37 @@ class Ascension(object):
         self.state = np.array(init_state)
 
     def position(self):
-        # compute the current x, y positions of the pendulum arms
         return [(self.state[1][n], self.state[2][n]) for n in range(self.planets)]
 
     def time_elapsed(self):
         return self.state[0][0]
 
     def step(self, h):
-        # Uses the trapes method to calculate the new state after h seconds.
+        print(saturn_v.get_mass(h))
+        self.mass[1] = saturn_v.get_mass(h)
+
         x = self.state
         s1 = self.ydot(x)
         s2 = self.ydot(np.array([(np.array(f) * h) for f in s1]) + x)
         self.state = x + h * (s1 + s2) / 2
-
-    def eulerstep(self, h):
-        # Uses the euler method to calculate the new state after h seconds.
-        x = self.state
-        self.state = x + h * self.ydot(x)
 
     def force(self, p, dist, gravity_mass):
         result = []
         for n in range(self.planets):
             temp_sum = 0
             for m in range(self.planets):
+
                 if n != m and dist[n][m] > earth_radius:
+
+                    if m == 2:
+                        temp_sum += saturn_v.get_force(self.time_elapsed())
+
                     temp_sum += (gravity_mass[m] * (p[m] - p[n])) / (dist[n][m]**3)
+                elif n != m and dist[n][m] < earth_radius:
+                    # Rocket has crashed into the planet. Force and velocity is removed
+                    self.state[3][1] = 0
+                    self.state[4][1] = 0
+
             result.append(temp_sum)
         return np.array(result)
 
@@ -59,7 +66,7 @@ grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius, 150000, 150000]
+rocket = [0, 0, earth_radius + earth_radius/10, 0, 150000]
 init = np.array([
     np.array([0.0]),
     np.array([planet[1], rocket[1]]),
@@ -74,6 +81,8 @@ planets = 2
 # make an Orbit instance
 orbit = Ascension(init, grav_const, mass, planets)
 dt = 1/300  # 300 frames per second
+
+saturn_v = SaturnV()
 
 # The figure is set
 fig = plot.figure()
@@ -95,13 +104,13 @@ def init():
 def animate(i):
     # perform animation step
     global orbit, dt
-    for i in range(10):
+    for i in range(1):
         orbit.step(dt)
     pos = orbit.position()
     line1.set_data(*pos[0])
     line2.set_data(*pos[1])
 
-    #Scale earth size
+    # Scale earth size
     # left, right = plot.xlim()
     # line1.set_markersize(0.0008*(right-left))
     # print(right-left)
