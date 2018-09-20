@@ -63,11 +63,23 @@ class System:
     def updateState(self, state):
         self.state = state;
         
-    def ydot(self, x):
+    def ydot(self):
         return np.array([np.array([1]), self.state[1], [self.velocityVector(i) for i in range(self.objLen)]]);
+
+    #def ydot2(self, x, name):
+    #    p = x[1];
+    #    return np.array([np.array([1]), x[2], self.velocityVector(name)]);
 
     def step(self, rate):
         for i in range(rate - 1):
             self.estimate.safeStep(self.state);
         return self.estimate.safeStep(self.state);
+
+    #def step2(self, rate):
+    #    r = None;
+    #    for j in range(objLen):
+    #       w = np.array([self.state[0], self.state[1][j], self.state[2][j]]);
+    #        for i in range(rate):
+    #            r = self.estimate[j].safeStep(w);
+    #    return r;
                           

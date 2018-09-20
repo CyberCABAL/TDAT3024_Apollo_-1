@@ -15,6 +15,7 @@ def main():
     dt = 1./30 # 30 frames per second
     tol = 05e-14;
     sys.estimate = RungeKuttaFehlberg54(sys.ydot, sys.dim, dt, tol, sys.objLen);
+                    #RungeKuttaFehlberg54(sys.ydot, sys.dim, dt, tol)];
 
     #F = lambda x
 

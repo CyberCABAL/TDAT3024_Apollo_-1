@@ -35,11 +35,11 @@ class RungeKuttaFehlberg54:
         #s = np.zeros((6, self.dim));
         s = np.array([[np.array([0]), np.array([np.zeros(self.n) for i in range(self.dim)]), np.array([np.zeros(self.n) for i in range(self.dim)])] for j in range(6)]);
 
-        for i in range(1, 6):
+        for i in range(0, 6):
             print(W_in, "\n");
-            print(self.A[i, 0:i].dot(s[0:i, :]), "\n");
             print(self.A[i, 0:i], "\n");
             print(s[0:i, :], "\n");
+            print(self.A[i, 0:i].dot(s[0:i, :]), "\n");
             print(W_in + self.h * self.A[i, 0:i].dot(s[0:i, :]));
             s[i, :] = self.F(W_in + self.h * self.A[i, 0:i].dot(s[0:i, :]));
 
