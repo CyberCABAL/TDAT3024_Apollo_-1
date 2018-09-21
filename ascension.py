@@ -100,6 +100,12 @@ def animate(i):
     pos = orbit.position()
     line1.set_data(*pos[0])
     line2.set_data(*pos[1])
+
+    #Scale earth size
+    # left, right = plot.xlim()
+    # line1.set_markersize(0.0008*(right-left))
+    # print(right-left)
+
     time_text.set_text('time = %.1f' % orbit.time_elapsed())
     return line1, line2, time_text
 
