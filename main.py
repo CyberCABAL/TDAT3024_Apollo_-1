@@ -45,7 +45,7 @@ def main():
     def animate(i):
         #perform animation step
         global sys;
-        sys.step(10);
+        sys.step(5);
         line1.set_data(*sys.objects[0].position[0:2]);
         line2.set_data(*sys.objects[1].position[0:2]);
         time_text.set_text('time = %.1f' % sys.time_elapsed());

@@ -24,7 +24,7 @@ class System:
         return self.state[0][0];
 
     def objectsToState(self):
-        self.state = np.array([[t],
+        self.state = np.array([self.state[0],
                                [[objects[i].position[j] for i in range(self.objLen)] for j in range(self.dim)],
                                [[objects[i].dirVec[j] for i in range(self.objLen)] for j in range(self.dim)],
                                ]);
@@ -34,11 +34,13 @@ class System:
         self.objLen += 1;
 
     def stateToObjects(self):
+        state1 = self.state[1].T;
+        state2 = self.state[2].T;
         for i in range(self.objLen):
-            objects[i].position = self.state[1][i];
-            objects[i].dirVec = self.state[2][i];
+            self.objects[i].position = state1[i];
+            self.objects[i].dirVec = state2[i];
 
-    def velocityVector(self, i = None, name = None):
+    def velocityVector(self, x, i = None, name = None):
         if (i is None):
             if (name is not None):
                 for j in range(self.objLen):
@@ -46,34 +48,52 @@ class System:
                         i = j;
             else:
                 return np.zeros(3);
-            
-        dist = [(fy.dist(self.objects[i], self.objects[j]) if (i != j) else 0.1) for j in range(self.objLen)];      
-        p0 = self.objects[i].position;
+        p = x[1];
+        dist = self.distPos(p);
+        p0 = p[:, i];
 
         vec = np.zeros(3);
+        #print("p:", p);
         for j in range(self.objLen):
             if (i != j):
-                r = dist[j];
+                r = dist[i][j];     # Can be simplified, there is only one i.
                 if (r == 0):
                     r = 0.1;
-                pj = self.objects[j];
-                vec += (pj.gm * (pj.position - p0)) / (r * r * r);
+                vec += (self.objects[j].gm * (p[:, j] - p0)) / (r * r * r);
+        #print(vec);
         return vec;
+
+    def distPos(self, x):
+        return [[self.__tempSum(x, n, m)**(1.5) for m in range(self.objLen)] for n in range(self.objLen)];
+
+    def __tempSum(self, x, n, m):
+        sum0 = 0;
+        for i in range(0, self.dim):
+            temp = x[i][m] - x[i][n];
+            sum0 += temp * temp;
+        return sum0;
 
     def updateState(self, state):
         self.state = state;
         
-    def ydot(self):
-        return np.array([np.array([1]), self.state[1], [self.velocityVector(i) for i in range(self.objLen)]]);
+    def ydot(self, x):
+        v = np.array([self.velocityVector(x, i) for i in range(self.objLen)]);
+        #print("Test1:", v);
+        #print("Test2:", v.T);
+        return np.array([np.array([1]), x[1], v.T]);
 
     #def ydot2(self, x, name):
     #    p = x[1];
     #    return np.array([np.array([1]), x[2], self.velocityVector(name)]);
 
-    def step(self, rate):
+    def step(self, rate = 3):
+        W, E = self.estimate.safeStep(self.state);
+        self.updateState(W);
         for i in range(rate - 1):
-            self.estimate.safeStep(self.state);
-        return self.estimate.safeStep(self.state);
+            W, E = self.estimate.safeStep(W);
+            self.updateState(W);
+        self.stateToObjects();
+        return W, E;
 
     #def step2(self, rate):
     #    r = None;
