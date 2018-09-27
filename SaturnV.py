@@ -135,23 +135,25 @@ class SaturnV(object):
             else:
                 return self.step_force[2]
         else:
-            if t > (self.step_time[0]+self.step_time[1]+self.step_time[2]):
+            if t > (self.steptime[0]+self.steptime[1]+self.steptime[2]):
                 return 0
             else:
                 raise ValueError('Velg en t i intervallet [0, ->]')
+
+def main():
+    saturn_v = SaturnV()
+    saturn_v.saturn_v_info()
+
+    print("\nTotalmasse i starten av steg 1: ",saturn_v.get_step_start_mass(0), "kg")
+    print("\nTotalmasse i starten av steg 2: ",saturn_v.get_step_start_mass(1), "kg")
+    print("\nTotalmasse i starten av steg 3: ",saturn_v.get_step_start_mass(2), "kg")
+
+    print("\nMasse ved ulike t-verdier")
+    saturn_v.mass_table()
+
+if __name__ == "__main__":
+    main();
         
 
-saturn_v = SaturnV()
-saturn_v.saturn_v_info()
 
-print("\nTotalmasse i starten av steg 1: ",saturn_v.get_step_start_mass(0), "kg")
-print("\nTotalmasse i starten av steg 2: ",saturn_v.get_step_start_mass(1), "kg")
-print("\nTotalmasse i starten av steg 3: ",saturn_v.get_step_start_mass(2), "kg")
 
-print("\nMasse ved ulike t-verdier")
-saturn_v.mass_table()
-#print(saturn_v.get_mass(169))
-
-#print(saturn_v.get_force(100))
-#print(saturn_v.get_force(300))
-#print(saturn_v.get_force(600))
