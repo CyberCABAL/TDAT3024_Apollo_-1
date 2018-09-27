@@ -10,11 +10,25 @@ import matplotlib.patches as patch
 
 sys = System([CelestialObject([0., 0., 0.], [0., 0., 0.], 59722. * 10**20, 6378100, "Terra"),
               CelestialObject([362600., 0., 0.], [0., 1078.2, 0.], 734767309. * 10**14, 1737000, "Luna")]);
+"""
+p'1 = v1
+v'1 = Gm2(p2 - p1)/r**3_12
+p'2 = v2
+v'2 = Gm1(p1 - p2)/r**3_12
+
+p1(0) = [0,0,0]
+p2(0) = [362600., 0., 0.]
+p'1(0) = [0., 0., 0.]
+p'2(0) = [0., 1078.2, 0.]
+
+dim = 5
+W = [0, 0, 0, 0, 362600 0, 0, 0, 0, 0, 0, 1078.2, 0]
+"""
 
 def main():
     dt = 1./30 # 30 frames per second
-    tol = 05e-14;
-    sys.estimate = RungeKuttaFehlberg54(sys.ydot, sys.dim, dt, tol, sys.objLen);
+    tol = 05e-10;
+    sys.estimate = RungeKuttaFehlberg54(sys.ydot, 13, dt, tol);
                     #RungeKuttaFehlberg54(sys.ydot, sys.dim, dt, tol)];
 
     #F = lambda x
@@ -29,11 +43,9 @@ def main():
     # The figure is set
     fig = plot.figure();
     axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-sys.objects[1].position[0] - 50000, sys.objects[1].position[0] + 50000), ylim=(-sys.objects[1].position[0] - 50000, sys.objects[1].position[0] + 50000))
-    
     line1, = axes.plot([], [], "o-b", lw=2); # Terra
     line2, = axes.plot([], [], "o-k", lw=2); # Luna
     time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
-    
 
     def init():
         #initialize animation
@@ -45,7 +57,7 @@ def main():
     def animate(i):
         #perform animation step
         global sys;
-        sys.step(5);
+        sys.step(1);
         line1.set_data(*sys.objects[0].position[0:2]);
         line2.set_data(*sys.objects[1].position[0:2]);
         time_text.set_text('time = %.1f' % sys.time_elapsed());

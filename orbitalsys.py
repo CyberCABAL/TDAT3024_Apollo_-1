@@ -14,9 +14,10 @@ class System:
         self.objects = objects;
         self.objLen = len(objects);
         self.dim = len(objects[0].position);
-        self.state = np.array([np.array([t]),
-                               np.array([np.array([objects[i].position[j] for i in range(self.objLen)]) for j in range(self.dim)]),
-                               np.array([np.array([objects[i].dirVec[j] for i in range(self.objLen)]) for j in range(self.dim)]),
+        self.shape = np.array(objects).shape;
+        self.state = np.array([[t],
+                               [[objects[i].position[j] for i in range(self.objLen)] for j in range(self.dim)],
+                               [[objects[i].dirVec[j] for i in range(self.objLen)] for j in range(self.dim)],
                                ]);
         self.estimate = estimate;
 
@@ -34,8 +35,8 @@ class System:
         self.objLen += 1;
 
     def stateToObjects(self):
-        state1 = self.state[1].T;
-        state2 = self.state[2].T;
+        state1 = np.array(self.state[1]).T;
+        state2 = np.array(self.state[2]).T;
         for i in range(self.objLen):
             self.objects[i].position = state1[i];
             self.objects[i].dirVec = state2[i];
@@ -48,19 +49,17 @@ class System:
                         i = j;
             else:
                 return np.zeros(3);
-        p = x[1];
+        p = np.asarray(x[1]);
         dist = self.distPos(p);
         p0 = p[:, i];
 
         vec = np.zeros(3);
-        #print("p:", p);
         for j in range(self.objLen):
             if (i != j):
                 r = dist[i][j];     # Can be simplified, there is only one i.
                 if (r == 0):
                     r = 0.1;
                 vec += (self.objects[j].gm * (p[:, j] - p0)) / (r * r * r);
-        #print(vec);
         return vec;
 
     def distPos(self, x):
@@ -77,22 +76,52 @@ class System:
         self.state = state;
         
     def ydot(self, x):
+        x = self.reshapeBack_W(x);
         v = np.array([self.velocityVector(x, i) for i in range(self.objLen)]);
-        #print("Test1:", v);
-        #print("Test2:", v.T);
-        return np.array([np.array([1]), x[1], v.T]);
+        return self.reshape_W(np.array([[1], x[1], v.T]));
 
-    #def ydot2(self, x, name):
-    #    p = x[1];
-    #    return np.array([np.array([1]), x[2], self.velocityVector(name)]);
+    def reshape_W(self, W):
+        res = [W[0][0]];
+        p_T = np.array(W[1]).T
+        for p in p_T:
+            for p_x in p:
+                res.append(p_x);
+        v_T = np.array(W[2]).T
+        for v in v_T:
+            for v_x in v:
+                res.append(v_x);
+        return np.array(res);
+
+    def reshapeBack_W(self, W_out):
+        l = self.objLen;
+        d = self.dim;
+        res = [[W_out[0]]];
+        temp1 = [];
+        w_x = 1;
+        for j in range(l):
+            temp2 = [];
+            for i in range(w_x, w_x + d):
+                temp2.append(W_out[i]);
+                w_x += 1;
+            temp1.append(temp2);
+        res.append(np.array(temp1).T.tolist());
+        temp1 = [];
+        for j in range(l):
+            temp2 = [];
+            for i in range(w_x, w_x + d):
+                temp2.append(W_out[i]);
+                w_x += 1;
+            temp1.append(temp2);
+        res.append(np.array(temp1).T.tolist());
+        return np.array(res);
 
     def step(self, rate = 3):
-        W, E = self.estimate.safeStep(self.state);
-        self.updateState(W);
+        W, E = self.estimate.safeStep(self.reshape_W(self.state));
         for i in range(rate - 1):
             W, E = self.estimate.safeStep(W);
-            self.updateState(W);
+        self.updateState(self.reshapeBack_W(W));
         self.stateToObjects();
+        print(self.state);
         return W, E;
 
     #def step2(self, rate):

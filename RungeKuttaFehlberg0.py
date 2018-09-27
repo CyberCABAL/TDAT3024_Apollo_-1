@@ -24,23 +24,32 @@ class RungeKuttaFehlberg54:
          [  16/135,    0     , 6656/12825, 28561/56430, -9/50, 2/55]]);
 
     def __init__(self, function, dimension,
-                 stepsize, tolerance):
+                 stepsize, tolerance, n):
         self.F = function;
         self.dim = dimension;
         self.h = stepsize;
         self.tol = tolerance;
+        self.n = n;
     
     def step(self, W_in):
-        s = np.zeros((6, self.dim));
-
+        s = np.array([[np.array([0]), np.zeros((self.dim, self.n)), np.zeros((self.dim, self.n))] for j in range(6)]);
+        print(W_in, "\n");
         for i in range(0, 6):
-            s[i, :] = self.F(W_in + self.h * self.A[i, 0:i].dot(s[0:i, :]));
+            s0 = s[0:i, :];
+            if (len(s0) < 1):
+                s0 = np.array([]);
+            dot = np.array(self.A[i, 0:i].dot(s0));
+            hdot = np.array(dot * self.h);
+            
+            #print("Old_s: ", W_in + hdot);
+            s[i, :] = self.F(W_in + hdot);
+            #print("New_s: ", s[i, :]);
 
         Z_out = W_in + self.h * (self.B[0, :].dot(s));
         W_out = W_in + self.h * (self.B[1, :].dot(s));
 
         E = np.linalg.norm(W_out - Z_out, 2) / np.linalg.norm(W_out, 2);
-        return W_out, E;
+        return W_out, np.mean(E);
 
     def safeStep(self, W_in):
         W_out, E = self.step(W_in);
