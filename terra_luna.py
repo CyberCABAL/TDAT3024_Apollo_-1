@@ -128,6 +128,7 @@ class Orbit:
         py = x[2];
         vx = x[3];
         vy = x[4];
+        #distance cubed (**3)
         dist = [[((px[m] - px[n])**2 + (py[m] - py[n])**2)**(1.5) for m in range(self.planets)]
                 for n in range(self.planets)];
                 
