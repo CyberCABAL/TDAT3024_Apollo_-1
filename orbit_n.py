@@ -86,8 +86,8 @@ class Orbit:
 
         e = np.linalg.norm(w - z, 2) / np.linalg.norm(w, 2)
 
-        print(w)
-        self.state = w
+        # print(w)
+        # self.state = w
 
         return w, e
 
@@ -152,7 +152,7 @@ def init():
 def animate(i):
     #perform animation step
     global orbit, dt;
-    for i in range(1):
+    for i in range(10):
         orbit.rk_safestep();
     pos = orbit.position();
     line1.set_data(*pos[0]);
