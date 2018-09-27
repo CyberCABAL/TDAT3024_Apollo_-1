@@ -1,30 +1,31 @@
 from numpy import sqrt
 import time
-from RungeKuttaFehlberg import RungeKuttaFehlberg54
 import numpy as np
 import math
+import sys
 
 import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 
-#G = 6.67408 * 10**(-11);	# Real G
-G = 1.0;
-m = np.array([5.9736, 0.073477]);
+G = 6.67408 * 10**(-11);	# Real G
+#G = 1.0;
+m = np.array([5.9722 * 10**24, 7.34767309 * 10**22]);
+dim = 362600000 * 2;
 init = np.array([
     np.array([0, 0]),
-    np.array([0.0, 0]),
-    np.array([0.0, 360]),
-    np.array([0.0, .13]),
-    np.array([0.0, 0])]);
-
+    np.array([0, 362600000.]),
+    np.array([0, 0]),
+    np.array([0, 0]),
+    np.array([0., 1078.2])]);
+#lunar velocity at this point = 1.0782 km/s;
 class Orbit:
     def __init__(self,
                  init_state = [[0, 0, 0], [0, 1, 2], [0, 1, 2], [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
-                 G=1,
+                 G=6.67408 * 10**(-11),
                  mass = [1, 1, 1],
                  planets = 3,
-                 stepsize = 0.15,
-                 tolerance = 05e-15):
+                 stepsize = 0.25,
+                 tolerance = 05e-8):
         self.GravConst = G;
         self.m = mass;
         self.planets = planets;
@@ -86,8 +87,7 @@ class Orbit:
 
         e = np.linalg.norm(w - z, 2) / np.linalg.norm(w, 2)
 
-        print(w)
-        self.state = w
+        #self.state = w
 
         return w, e
 
@@ -97,7 +97,6 @@ class Orbit:
         s1 = self.ydot(x);
         s2 = self.ydot(np.array([(np.array(f) * h) for f in s1]) + x)
         self.state = x + h * (s1 + s2) / 2;
-        print(self.state)
         
     def eulerstep(self, h):
         #Uses the euler method to calculate the new state after h seconds.
@@ -113,41 +112,48 @@ class Orbit:
                     tempSum += (Gm[m] * (p[m] - p[n])) / (dist[n][m]);
             result.append(tempSum);
         return np.array(result);
+
+    def distance(self, x_0, x_1):
+        p0 = np.array(x_0);
+        p1 = np.array(x_1);
+        delta = [p0[i] - p1[i] for i in range(len(p0))]
+        distSum = 0
+        for i in range(len(p0)):
+            distSum += delta[i] * delta[i]
+        return math.sqrt(distSum)
     
     def ydot(self, x):
-        '''''
-        y1 =
-        '''
         Gm = self.m * self.GravConst;
         px = x[1];
         py = x[2];
         vx = x[3];
         vy = x[4];
+        #distance cubed (**3)
         dist = [[((px[m] - px[n])**2 + (py[m] - py[n])**2)**(1.5) for m in range(self.planets)]
                 for n in range(self.planets)];
                 
         return np.array([np.ones(self.planets), vx, vy, self.force(px, dist, Gm), self.force(py, dist, Gm)]);
 
 # make an Orbit instance
-orbit = Orbit(init_state=init, G=G, mass=m, planets=2);
+orbit = Orbit(init, G, m, 2);
 dt = 1./30 # 30 frames per second
 
 # The figure is set
 fig = plot.figure();
-axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-1000, 1000), ylim=(-1000, 1000))
+axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-dim, dim), ylim=(-dim, dim))
 
-line1, = axes.plot([], [], "o-b", ms=12.7); # A green planet
-line2, = axes.plot([], [], marker='o', color='tab:gray', ms=1.7); # A red planet
-# line3, = axes.plot([], [], "o-g", lw=2); # A blue planet
+line1, = axes.plot([], [], "o-g", lw=2); # A green planet
+line2, = axes.plot([], [], "o-b", lw=2); # A blue planet
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
+dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes);
 
 def init():
     #initialize animation
     line1.set_data([], []);
     line2.set_data([], []);
-    # line3.set_data([], []);
     time_text.set_text('');
-    return line1, line2, time_text;
+    dist_text.set_text("");
+    return line1, line2, time_text, dist_text;
 
 def animate(i):
     #perform animation step
@@ -157,9 +163,9 @@ def animate(i):
     pos = orbit.position();
     line1.set_data(*pos[0]);
     line2.set_data(*pos[1]);
-    # line3.set_data(*pos[2]);
+    dist_text.set_text("distance = %.1f" % orbit.distance(list(pos[0]), list(pos[1])));
     time_text.set_text('time = %.1f' % orbit.time_elapsed());
-    return line1, line2, time_text;
+    return line1, line2, time_text, dist_text;
 
 # choose the interval based on dt and the time to animate one step
 # Take the time for one call of the animate.
