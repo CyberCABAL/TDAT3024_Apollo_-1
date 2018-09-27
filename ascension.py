@@ -2,6 +2,8 @@ import time
 import matplotlib.animation as animation
 import matplotlib.pyplot as plot
 import numpy as np
+import fy
+from fy import CelestialObject
 from SaturnV import SaturnV
 from RungeKuttaFehlberg import RungeKuttaFehlberg54
 
@@ -20,7 +22,6 @@ class Ascension(object):
         return self.state[0][0]
 
     def step(self, h):
-        print(saturn_v.get_mass(h))
         self.mass[1] = saturn_v.get_mass(h)
 
         x = self.state
@@ -32,16 +33,17 @@ class Ascension(object):
         result = []
         for n in range(self.planets):
             temp_sum = 0
+
             for m in range(self.planets):
+
+                if n == 1:
+                    temp_sum += saturn_v.get_force(self.time_elapsed()) / saturn_v.get_mass(self.time_elapsed())
 
                 if n != m and dist[n][m] > earth_radius:
 
-                    if m == 2:
-                        temp_sum += saturn_v.get_force(self.time_elapsed())
-
                     temp_sum += (gravity_mass[m] * (p[m] - p[n])) / (dist[n][m]**3)
                 elif n != m and dist[n][m] < earth_radius:
-                    # Rocket has crashed into the planet. Force and velocity is removed
+                    # Rocket has crashed into the planet. Velocity is removed from rocket
                     self.state[3][1] = 0
                     self.state[4][1] = 0
 
@@ -66,7 +68,7 @@ grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius + earth_radius/10, 0, 150000]
+rocket = [0, 0, earth_radius+10, 0, 0]
 init = np.array([
     np.array([0.0]),
     np.array([planet[1], rocket[1]]),
@@ -91,6 +93,7 @@ axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-5*earth_r
 line1, = axes.plot([], [], "o-g", lw=2, ms=earth_radius/125)  # A blue planet
 line2, = axes.plot([], [], "2-r", lw=2, ms=earth_radius/1000)  # A red rocket ship
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes)
+height_text = axes.text(0.02, 0.90, "", transform=axes.transAxes)
 
 
 def init():
@@ -98,7 +101,8 @@ def init():
     line1.set_data([], [])
     line2.set_data([], [])
     time_text.set_text('')
-    return line1, line2, time_text
+    height_text.set_text('')
+    return line1, line2, time_text, height_text
 
 
 def animate(i):
@@ -116,7 +120,8 @@ def animate(i):
     # print(right-left)
 
     time_text.set_text('time = %.1f' % orbit.time_elapsed())
-    return line1, line2, time_text
+    height_text.set_text('height =  %.1f' % 1)
+    return line1, line2, time_text, height_text
 
 
 # choose the interval based on dt and the time to animate one step
@@ -125,7 +130,7 @@ t0 = time.time()
 animate(0)
 t1 = time.time()
 
-delay = 1000 * dt - (t1 - t0)
+delay = 2000 * dt - (t1 - t0)
 
 anim = animation.FuncAnimation(fig,             # figure to plot in
                                animate,         # function that is called on each frame
