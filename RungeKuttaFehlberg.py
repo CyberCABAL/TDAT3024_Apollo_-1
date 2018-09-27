@@ -80,15 +80,7 @@ class RungeKuttaFehlberg54:
         self.h = self.h / 2;
         
     def setStepLength(self, stepLength):
-        self.h = stepLength;        
-        
-"""def F(Y):
-    M = np.array([[0.49119653, 0.32513304, 0.98057799],
-                [0.20768544, 0.97699416, 0.18220559],
-                [0.96407071, 0.18373237, 0.95307793]]);
-    res = np.ones(4);
-    res[0:3] = M.dot(Y[0:3]);
-    return res;"""
+        self.h = stepLength;
 
 def F(Y):
     M = np.array([[1, 1],
