@@ -107,18 +107,17 @@ class Ascension(object):
             #Rocket motor
             if n == 1:
                 F = saturn_v.get_force(self.time_elapsed())
-                temp_sum += F / mass[n]
+                temp_sum += F / saturn_v.get_mass(self.time_elapsed())
 
-                Fg = G * (mass[0] * mass[n] * (p[0] - p[n])) / (dist[n][0] ** 3)
-                a = Fg / mass[n]
-                print('g acc: ' + str(a) +'\t f acc: '+str(temp_sum) + '\n')
+                #temp_sum += G * (mass[0] * (p[0] - p[n])) / (dist[n][0] ** 3)
+                #print('f acc: '+str(temp_sum) + '\n')
 
             #Gravitational forces
+            
             for m in range(self.planets):
                 if n != m and dist[n][m] > earth_radius:
-                    F = G*(mass[m]*mass[n]*(p[m] - p[n])) / (dist[n][m]**3)
-                    a = F/mass[n]
-                    temp_sum += a
+                    F = G*(mass[m]*(p[m] - p[n])) / (dist[n][m]**3)
+                    temp_sum += F
                 elif n != m and dist[n][m] < earth_radius:
                     # Rocket has crashed into the planet. Velocity is removed from rocket
                     self.state[3][1] = 0
@@ -147,7 +146,7 @@ grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius+100, 0, 10]
+rocket = [0, 0, earth_radius+100, 2, 10]
 init = np.array([
     np.array([0.0, 0]),
     np.array([planet[1], rocket[1]]),
