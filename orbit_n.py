@@ -9,13 +9,13 @@ import matplotlib.animation as animation
 
 #G = 6.67408 * 10**(-11);	# Real G
 G = 1.0;
-m = np.array([1, 1, 1]);
+m = np.array([5.9736, 0.073477]);
 init = np.array([
-    np.array([0.0, 0, 0]),
-    np.array([-0.970, 0.970, 0.0]),
-    np.array([0.243, -0.243, 0.0]),
-    np.array([-0.466, -0.466, 0.866]),
-    np.array([-0.433, -0.433, 0.866])]);
+    np.array([0, 0]),
+    np.array([0.0, 0]),
+    np.array([0.0, -0.243]),
+    np.array([0.0, -0.466]),
+    np.array([0.0, -0.433])]);
 
 class Orbit:
     def __init__(self,
@@ -126,28 +126,28 @@ class Orbit:
         dist = [[((px[m] - px[n])**2 + (py[m] - py[n])**2)**(1.5) for m in range(self.planets)]
                 for n in range(self.planets)];
                 
-        return np.array([np.ones(3), vx, vy, self.force(px, dist, Gm), self.force(py, dist, Gm)]);
+        return np.array([np.ones(self.planets), vx, vy, self.force(px, dist, Gm), self.force(py, dist, Gm)]);
 
 # make an Orbit instance
-orbit = Orbit(init, G, m, 3);
+orbit = Orbit(init_state=init, G=G, mass=m, planets=2);
 dt = 1./30 # 30 frames per second
 
 # The figure is set
 fig = plot.figure();
-axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-10, 10), ylim=(-10, 10))
+axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-8, 8), ylim=(-10, 10))
 
-line1, = axes.plot([], [], "o-g", lw=2); # A green planet
-line2, = axes.plot([], [], "o-b", lw=2); # A blue planet
-line3, = axes.plot([], [], "o-r", lw=2); # A red planet
+line1, = axes.plot([], [], "o-b", ms=1.7); # A green planet
+line2, = axes.plot([], [], marker='o', color='tab:gray', ms=12.7); # A red planet
+# line3, = axes.plot([], [], "o-g", lw=2); # A blue planet
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
 
 def init():
     #initialize animation
     line1.set_data([], []);
     line2.set_data([], []);
-    line3.set_data([], []);
+    # line3.set_data([], []);
     time_text.set_text('');
-    return line1, line2, line3, time_text;
+    return line1, line2, time_text;
 
 def animate(i):
     #perform animation step
@@ -157,9 +157,9 @@ def animate(i):
     pos = orbit.position();
     line1.set_data(*pos[0]);
     line2.set_data(*pos[1]);
-    line3.set_data(*pos[2]);
+    # line3.set_data(*pos[2]);
     time_text.set_text('time = %.1f' % orbit.time_elapsed());
-    return line1, line2, line3, time_text;
+    return line1, line2, time_text;
 
 # choose the interval based on dt and the time to animate one step
 # Take the time for one call of the animate.
