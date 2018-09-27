@@ -4,12 +4,16 @@ from RungeKuttaFehlberg import RungeKuttaFehlberg54
 
 import numpy as np
 import time
+import fy
 import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 import matplotlib.patches as patch
 
-sys = System([CelestialObject([0., 0., 0.], [0., 0., 0.], 59722. * 10**20, 6378100, "Terra"),
-              CelestialObject([362600., 0., 0.], [0., 1078.2, 0.], 734767309. * 10**14, 1737000, "Luna")]);
+dt = 1./30 # 30 frames per second
+tol = 05e-14;
+sys = System([CelestialObject([0., 0., 0.], [0., 0., 0.], 5.9722 * 10**24, 6378100, "Terra"),
+              CelestialObject([362600000., 0., 0.], [0., 1078.2, 0.], 7.34767309 * 10**22, 1737000, "Luna")], stepsize = dt, tol = tol);
+winDimention = 362600000. * 2;
 """
 p'1 = v1
 v'1 = Gm2(p2 - p1)/r**3_12
@@ -26,10 +30,6 @@ W = [0, 0, 0, 0, 362600 0, 0, 0, 0, 0, 0, 1078.2, 0]
 """
 
 def main():
-    dt = 1./30 # 30 frames per second
-    tol = 05e-10;
-    sys.estimate = RungeKuttaFehlberg54(sys.ydot, 13, dt, tol);
-                    #RungeKuttaFehlberg54(sys.ydot, sys.dim, dt, tol)];
 
     #F = lambda x
 
@@ -42,26 +42,29 @@ def main():
 
     # The figure is set
     fig = plot.figure();
-    axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-sys.objects[1].position[0] - 50000, sys.objects[1].position[0] + 50000), ylim=(-sys.objects[1].position[0] - 50000, sys.objects[1].position[0] + 50000))
+    axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-winDimention, winDimention), ylim=(-winDimention, winDimention));
     line1, = axes.plot([], [], "o-b", lw=2); # Terra
     line2, = axes.plot([], [], "o-k", lw=2); # Luna
     time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
+    dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes);
 
     def init():
         #initialize animation
         line1.set_data([], []);
         line2.set_data([], []);
         time_text.set_text('');
-        return line1, line2, time_text;
+        dist_text.set_text("");
+        return line1, line2, time_text, dist_text;
 
     def animate(i):
         #perform animation step
         global sys;
-        sys.step(1);
-        line1.set_data(*sys.objects[0].position[0:2]);
-        line2.set_data(*sys.objects[1].position[0:2]);
+        sys.step(3);
+        line1.set_data(*sys.objects[0].position);
+        line2.set_data(*sys.objects[1].position);
         time_text.set_text('time = %.1f' % sys.time_elapsed());
-        return line1, line2, time_text;
+        dist_text.set_text("distance = %.1f" % fy.dist(sys.objects[0], sys.objects[1]));
+        return line1, line2, time_text, dist_text;
 
     # choose the interval based on dt and the time to animate one step
     # Take the time for one call of the animate.
