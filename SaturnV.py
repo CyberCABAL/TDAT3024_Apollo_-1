@@ -5,25 +5,28 @@ Totalvekt:  2970000  kg
 Steg:  1 
 Totalvekt:  2290000  kg 
 Vekt uten drivstoff:  130000  kg 
-Drivstoff i kg:  2160000  kg 
-Masseendring:  -12857.142857142857  kg/s 
+Drivstoff i kg:  2160000  kg
+Varighet i s:  168  s 
+Masseendring:  -12857.14 kg/s 
 Hastighet:  2730.0  m/s
 Skyvekraft:  35100000  N
 
 Steg:  2 
 Totalvekt:  496200.0  kg 
 Vekt uten drivstoff:  40100.0  kg 
-Drivstoff i kg:  456100.0  kg 
-Masseendring:  -1266.9444444444443  kg/s 
-Hastighet:  4057.7943433457576  m/s
+Drivstoff i kg:  456100.0  kg
+Varighet i s:  360  s 
+Masseendring:  -1266.94 kg/s 
+Hastighet:  4057.79  m/s
 Skyvekraft:  5141000  N
 
 Steg:  3 
 Totalvekt:  123000  kg
 Vekt uten drivstoff:  13500.0  kg 
-Drivstoff i kg:  109500.0  kg 
+Drivstoff i kg:  109500.0  kg
+Varighet i s:  500  s 
 Masseendring:  -219.0  kg/s 
-Hastighet:  4566.2100456621  m/s
+Hastighet:  4566.21  m/s
 Skyvekraft:  1000000  N
 '''
 
@@ -68,8 +71,9 @@ class SaturnV(object):
         print("Steg: ", step_number, "\nTotalvekt: ", self.step_mass[steg], " kg",
               "\nVekt uten drivstoff: ", self.step_mass_without_fuel[steg], " kg",
               "\nDrivstoff i kg: ", self.get_fuel(steg), " kg",
-              "\nMasseendring: ", self.get_mass_difference(steg), " kg/s",
-              "\nHastighet: ", self.get_velocity(steg), " m/s",
+              "\nVarighet i s: ", self.step_time[steg], " s",
+              "\nMasseendring: ", round(self.get_mass_difference(steg),2), " kg/s",
+              "\nHastighet: ", round(self.get_velocity(steg),2), " m/s",
               "\nSkyvekraft: ", self.step_force[steg], " N")
 
     def saturn_v_info(self):
@@ -77,6 +81,21 @@ class SaturnV(object):
         for i in range(3):
             print("\n")
             self.step_info(i + 1)
+
+    def mass_table(self):
+        print("Steg 1:")
+        for i in range(4):
+            print("t:", i*50, "s", "\tmasse:", round(self.get_mass(i*50),0), "kg")
+        print("t: 168 s", "\tmasse:", round(self.get_mass(168),0), "kg", "\n\nSteg 2:")
+        print("t: 168.1 s", "\tmasse:", round(self.get_mass(168.1),0), "kg")
+        for i in range(4,11):
+              print("t:", i*50, "s", "\tmasse:", round(self.get_mass(i*50),0), "kg")
+        print("t: 528 s", "\tmasse:", round(self.get_mass(528),0), "kg", "\n\nSteg 3:")
+        print("t: 528.1 s", "\tmasse:", round(self.get_mass(528.1),0), "kg")
+        for i in range (11, 21):
+            print("t:", i*50, "s", "\tmasse:", round(self.get_mass(i*50),0), "kg")
+        print("t: 1028 s", "\tmasse:", round(self.get_mass(1028),0), "kg")
+        print("t: 1028.1 s", "\tmasse:", round(self.get_mass(1028.1),0), "kg")
 
     def get_step_start_mass(self, x):
         # Finner totalmassen til raketten rett før hver trinn tennes
@@ -123,9 +142,16 @@ class SaturnV(object):
         
 
 saturn_v = SaturnV()
-#saturn_v.saturn_v_info()
-print(saturn_v.get_mass(169))
+saturn_v.saturn_v_info()
 
-print(saturn_v.get_force(100))
-print(saturn_v.get_force(300))
-print(saturn_v.get_force(600))
+print("\nTotalmasse i starten av steg 1: ",saturn_v.get_step_start_mass(0), "kg")
+print("\nTotalmasse i starten av steg 2: ",saturn_v.get_step_start_mass(1), "kg")
+print("\nTotalmasse i starten av steg 3: ",saturn_v.get_step_start_mass(2), "kg")
+
+print("\nMasse ved ulike t-verdier")
+saturn_v.mass_table()
+#print(saturn_v.get_mass(169))
+
+#print(saturn_v.get_force(100))
+#print(saturn_v.get_force(300))
+#print(saturn_v.get_force(600))
