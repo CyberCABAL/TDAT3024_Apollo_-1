@@ -156,15 +156,18 @@ saturn_v = SaturnV()
 fig = plot.figure()
 axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-5*earth_radius, 5*earth_radius), ylim=(-5*earth_radius, 5*earth_radius))
 
-line1, = axes.plot([], [], "o-g", lw=2, ms=earth_radius/125)  # A blue planet
-line2, = axes.plot([], [], "2-r", lw=2, ms=earth_radius/1000)  # A red rocket ship
-trail, = axes.plot([], [], "o-b", lw=2, ms=earth_radius/10000)  # A red rocket ship
+trail, = axes.plot([], [], "ob", ms=earth_radius/100000, label='trail')  # A blue dotted trail
+line1, = axes.plot([], [], "o-g", lw=0, ms=earth_radius/125, label='Earth')  # A blue planet
+line2, = axes.plot([], [], "2-r", lw=0, ms=earth_radius/1000, label='Rocket')  # A red rocket ship
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes)
 posx_text = axes.text(0.02, 0.90, "", transform=axes.transAxes)
 posy_text = axes.text(0.02, 0.85, "", transform=axes.transAxes)
+legend = axes.legend(loc='lower right')
+for legend_handle in legend.legendHandles:
+    legend_handle._legmarker.set_markersize(6)
 
-trailx = []
-traily = []
+trailx = [rocket[1]]
+traily = [rocket[2]]
 
 def init():
     # initialize animation
