@@ -1,23 +1,22 @@
 import math
 import numpy as np
-import matplotlib.pyplot as plt
 
 G = 6.67408 * 10**(-11)
 
 
 class CelestialObject:
     def __init__(self,
-                 position=[0, 0, 0],
-                 dirVec=[0, 0, 0],
-                 mass=1,
-                 r=1):
-        self.mass = mass
-        self.r = r
-        self.position = position
-        self.dirVec = dirVec
+                 position = [0, 0, 0],
+                 dirVec = [0, 0, 0],
+                 mass = 1, r = 1, name = ""):
+        self.mass = mass;
+        self.gm = G * mass;
+        self.r = r;
+        self.position = np.array(position);
+        self.dirVec = np.array(dirVec);
+        self.name = name;
 
-
-# Force of gravity
+# Total force of gravity
 def F_G(x_0, x_1):
     r = dist(x_0, x_1)
     return G * x_0.mass * x_1.mass / (r * r)
@@ -25,12 +24,13 @@ def F_G(x_0, x_1):
 
 # Distance between two objects
 def dist(x_0, x_1):
-    p0 = x_0.position, p1 = x_1.position
-    delta = [p0[i] - p1[i] for i in range(len(p0))]
-    distSum = 0
+    p0 = x_0.position;
+    p1 = x_1.position;
+    delta = [p0[i] - p1[i] for i in range(len(p0))];
+    distSum = 0;
     for i in range(len(p0)):
-        distSum += delta[i] * delta[i]
-    return math.sqrt(distSum)
+        distSum += delta[i] * delta[i];
+    return math.sqrt(distSum);
 
 
 # Force of drag

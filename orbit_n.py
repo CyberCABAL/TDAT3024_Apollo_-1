@@ -7,16 +7,6 @@ import math
 import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 
-#G = 6.67408 * 10**(-11);	# Real G
-G = 1.0;
-m = np.array([5.9736, 0.073477]);
-init = np.array([
-    np.array([0, 0]),
-    np.array([0.0, 0]),
-    np.array([0.0, 360]),
-    np.array([0.0, .13]),
-    np.array([0.0, 0])]);
-
 class Orbit:
     def __init__(self,
                  init_state = [[0, 0, 0], [0, 1, 2], [0, 1, 2], [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]],
@@ -86,8 +76,8 @@ class Orbit:
 
         e = np.linalg.norm(w - z, 2) / np.linalg.norm(w, 2)
 
-        print(w)
-        self.state = w
+        # print(w)
+        # self.state = w
 
         return w, e
 
@@ -152,7 +142,7 @@ def init():
 def animate(i):
     #perform animation step
     global orbit, dt;
-    for i in range(1):
+    for i in range(10):
         orbit.rk_safestep();
     pos = orbit.position();
     line1.set_data(*pos[0]);
@@ -171,10 +161,10 @@ delay = 1000 * dt - (t1 - t0);
 
 anim=animation.FuncAnimation(fig,        # figure to plot in
                         animate,    # function that is called on each frame
-                        frames=3000, # total number of frames 
-                        interval=delay, # time to wait between each frame.
-                        repeat=False,
-                        blit=True, 
+                        frames = 3000, # total number of frames 
+                        interval = delay, # time to wait between each frame.
+                        repeat = False,
+                        blit = True, 
                         init_func=init # initialization
                         );
 

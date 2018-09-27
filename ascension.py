@@ -11,7 +11,7 @@ from SaturnV import SaturnV
 class Ascension(object):
     def __init__(self, init_state, grav_const, mass, planets,
                  stepsize=0.15,
-                 tolerance=05e-16):
+                 tolerance=05e-14):
         self.grav_const = grav_const
         self.mass = mass
         self.planets = planets
@@ -64,11 +64,18 @@ class Ascension(object):
 
     def rk_step(self, h):
         x = self.state
+        print('\n\nsteplength: '+str(h))
+        print('s1')
         s1 = self.ydot(x)
+        print('s2')
         s2 = self.ydot(x+h*1/4*s1)
+        print('s3')
         s3 = self.ydot(x+h*(3/32*s1 + 9/32*s2))
+        print('s4')
         s4 = self.ydot(x+h*(1932/2197*s1 + -7200/2197*s2 + 7296/2197*s3))
+        print('s5')
         s5 = self.ydot(x+h*(439/216*s1 + -8*s2 + 3680/513*s3 + -845/4104*s4))
+        print('s6')
         s6 = self.ydot(x+h*(-8/27*s1 + 2*s2 + -3544/2565*s3 + 1859/4104*s4 + -11/40*s5))
 
         w = x + h* (25/216*s1 + 1408/2565*s3 + 2197/4104*s4 + -1/5*s5)
@@ -76,8 +83,8 @@ class Ascension(object):
 
         e = np.linalg.norm(w - z, 2) / np.linalg.norm(w, 2)
 
-        print(w)
-        self.state = w
+        # print(w)
+        # self.state = w
 
         return w, e
 
@@ -97,20 +104,26 @@ class Ascension(object):
         for n in range(self.planets):
             temp_sum = 0
 
+            #Rocket motor
+            if n == 1:
+                F = saturn_v.get_force(self.time_elapsed())
+                temp_sum += F / mass[n]
+
+                Fg = G * (mass[0] * mass[n] * (p[0] - p[n])) / (dist[n][0] ** 3)
+                a = Fg / mass[n]
+                print('g acc: ' + str(a) +'\t f acc: '+str(temp_sum) + '\n')
+
+            #Gravitational forces
             for m in range(self.planets):
-
-                if n == 1:
-                    F = saturn_v.get_force(self.time_elapsed())
-                    temp_sum +=  F/mass[n]
-
                 if n != m and dist[n][m] > earth_radius:
                     F = G*(mass[m]*mass[n]*(p[m] - p[n])) / (dist[n][m]**3)
-                    temp_sum += F/mass[n]
+                    a = F/mass[n]
+                    temp_sum += a
                 elif n != m and dist[n][m] < earth_radius:
                     # Rocket has crashed into the planet. Velocity is removed from rocket
                     self.state[3][1] = 0
                     self.state[4][1] = 0
-                    #
+
                     # F = G * (mass[m] * mass[n] * (p[m] - p[n])) / (dist[n][m] ** 3)
                     # temp_sum += -F / mass[n]
 
@@ -127,14 +140,14 @@ class Ascension(object):
         return np.array([np.ones(self.planets), vx, vy, self.force(px, dist), self.force(py, dist)])
 
 
-earth_radius = 6.371 * 10**3
+earth_radius = 6.371 * 10**6
 earth_mass = 5.972 * 10**24
 rocket_mass = 2.97 * 10**6
 grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius+10, 0, 10]
+rocket = [0, 0, earth_radius+100, 0, 10]
 init = np.array([
     np.array([0.0, 0]),
     np.array([planet[1], rocket[1]]),
@@ -154,11 +167,12 @@ saturn_v = SaturnV()
 
 # The figure is set
 fig = plot.figure()
-axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-5*earth_radius, 5*earth_radius), ylim=(-5*earth_radius, 5*earth_radius))
+viewsize = 5
+axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-viewsize*earth_radius, viewsize*earth_radius), ylim=(-viewsize*earth_radius, viewsize*earth_radius))
 
-trail, = axes.plot([], [], "ob", ms=earth_radius/100000, label='trail')  # A blue dotted trail
-line1, = axes.plot([], [], "o-g", lw=0, ms=earth_radius/125, label='Earth')  # A blue planet
-line2, = axes.plot([], [], "2-r", lw=0, ms=earth_radius/1000, label='Rocket')  # A red rocket ship
+trail, = axes.plot([], [], "o-b", lw=1, ms=earth_radius/100000000, label='trail')  # A blue dotted trail
+line1, = axes.plot([], [], "o-g", lw=0, ms=earth_radius/125000, label='Earth')  # A blue planet
+line2, = axes.plot([], [], "2-r", lw=0, ms=earth_radius/1000000, label='Rocket')  # A red rocket ship
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes)
 posx_text = axes.text(0.02, 0.90, "", transform=axes.transAxes)
 posy_text = axes.text(0.02, 0.85, "", transform=axes.transAxes)
@@ -168,6 +182,7 @@ for legend_handle in legend.legendHandles:
 
 trailx = [rocket[1]]
 traily = [rocket[2]]
+framecounter = 1;
 
 def init():
     # initialize animation
@@ -182,9 +197,15 @@ def init():
 
 def animate(i):
     # perform animation step
-    global orbit, dt
+    global orbit, dt, framecounter
+
+    # while(orbit.time_elapsed() < framecounter/30):
     for i in range(1):
         orbit.rk_safestep()
+    # framecounter+= 1
+
+    # for i in range(10):
+    #     pass
     pos = orbit.position()
     trailx.append(pos[1][0])
     traily.append(pos[1][1])
@@ -197,9 +218,9 @@ def animate(i):
     line1.set_markersize(earth_radius/((right-left)/510))
     # print(right-left)
 
-    time_text.set_text('time = %.1f' % orbit.time_elapsed())
-    posx_text.set_text('posx =  %.1f' % orbit.position()[1][0])
-    posy_text.set_text('posy =  %.1f' % orbit.position()[1][1])
+    time_text.set_text('time = %.2f' % orbit.time_elapsed())
+    posx_text.set_text('posx =  %.3e' % orbit.position()[1][0])
+    posy_text.set_text('posy =  %.3e' % orbit.position()[1][1])
     return line1, line2, time_text, posx_text, posy_text, trail
 
 
