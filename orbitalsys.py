@@ -116,9 +116,9 @@ class System:
         return np.array(res);
 
     def step(self, rate = 3):
-        W, E = self.estimate.safeStep(self.reshape_W(self.state));
+        W, E = self.estimate.safe_step(self.reshape_W(self.state));
         for i in range(rate - 1):
-            W, E = self.estimate.safeStep(W);
+            W, E = self.estimate.safe_step(W);
         self.updateState(self.reshapeBack_W(W));
         self.stateToObjects();
         print(self.state);
