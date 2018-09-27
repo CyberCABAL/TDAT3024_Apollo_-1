@@ -13,9 +13,9 @@ m = np.array([5.9736, 0.073477]);
 init = np.array([
     np.array([0, 0]),
     np.array([0.0, 0]),
-    np.array([0.0, -0.243]),
-    np.array([0.0, -0.466]),
-    np.array([0.0, -0.433])]);
+    np.array([0.0, 360]),
+    np.array([0.0, .13]),
+    np.array([0.0, 0])]);
 
 class Orbit:
     def __init__(self,
@@ -23,8 +23,8 @@ class Orbit:
                  G=1,
                  mass = [1, 1, 1],
                  planets = 3,
-                 stepsize = 0.25,
-                 tolerance = 05e-10):
+                 stepsize = 0.15,
+                 tolerance = 05e-15):
         self.GravConst = G;
         self.m = mass;
         self.planets = planets;
@@ -134,10 +134,10 @@ dt = 1./30 # 30 frames per second
 
 # The figure is set
 fig = plot.figure();
-axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-8, 8), ylim=(-10, 10))
+axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-1000, 1000), ylim=(-1000, 1000))
 
-line1, = axes.plot([], [], "o-b", ms=1.7); # A green planet
-line2, = axes.plot([], [], marker='o', color='tab:gray', ms=12.7); # A red planet
+line1, = axes.plot([], [], "o-b", ms=12.7); # A green planet
+line2, = axes.plot([], [], marker='o', color='tab:gray', ms=1.7); # A red planet
 # line3, = axes.plot([], [], "o-g", lw=2); # A blue planet
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
 
@@ -152,7 +152,7 @@ def init():
 def animate(i):
     #perform animation step
     global orbit, dt;
-    for i in range(10):
+    for i in range(1):
         orbit.rk_safestep();
     pos = orbit.position();
     line1.set_data(*pos[0]);
