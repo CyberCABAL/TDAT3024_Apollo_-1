@@ -64,18 +64,18 @@ class Ascension(object):
 
     def rk_step(self, h):
         x = self.state
-        print('\n\nsteplength: '+str(h))
-        print('s1')
+        #print('\n\nsteplength: '+str(h))
+        #print('s1')
         s1 = self.ydot(x)
-        print('s2')
+        #print('s2')
         s2 = self.ydot(x+h*1/4*s1)
-        print('s3')
+        #print('s3')
         s3 = self.ydot(x+h*(3/32*s1 + 9/32*s2))
-        print('s4')
+        #print('s4')
         s4 = self.ydot(x+h*(1932/2197*s1 + -7200/2197*s2 + 7296/2197*s3))
-        print('s5')
+        #print('s5')
         s5 = self.ydot(x+h*(439/216*s1 + -8*s2 + 3680/513*s3 + -845/4104*s4))
-        print('s6')
+        #print('s6')
         s6 = self.ydot(x+h*(-8/27*s1 + 2*s2 + -3544/2565*s3 + 1859/4104*s4 + -11/40*s5))
 
         w = x + h* (25/216*s1 + 1408/2565*s3 + 2197/4104*s4 + -1/5*s5)
@@ -146,7 +146,7 @@ grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius+100, 2, 10]
+rocket = [0, 0, earth_radius+10, 10, 0]
 init = np.array([
     np.array([0.0, 0]),
     np.array([planet[1], rocket[1]]),

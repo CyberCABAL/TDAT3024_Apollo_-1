@@ -135,7 +135,7 @@ class SaturnV(object):
             else:
                 return self.step_force[2]
         else:
-            if t > (self.steptime[0]+self.steptime[1]+self.steptime[2]):
+            if t > (self.step_time[0]+self.step_time[1]+self.step_time[2]):
                 return 0
             else:
                 raise ValueError('Velg en t i intervallet [0, ->]')
