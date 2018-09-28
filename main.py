@@ -9,9 +9,9 @@ import matplotlib.animation as animation
 
 dt = 1./30 # 30 frames per second
 tol = 05e-14;
-sys = System([CelestialObject([0., 0.], [0., 0.], 5.9722 * 10**24, 6378100, "Terra"),
+sys = System([CelestialObject([0., 0.], [0., -15.], 5.9722 * 10**24, 6378100, "Terra"),
               CelestialObject([362600000., 0.], [0., 1078.2], 7.34767309 * 10**22, 1737000, "Luna")], stepsize = dt, tol = tol);
-winDimention = 362600000. * 2;
+winDimention = 362600000. * 3/2;
 """
 p'1 = v1
 v'1 = Gm2(p2 - p1)/r**3_12
@@ -23,30 +23,48 @@ p2(0) = [362600., 0., 0.]
 p'1(0) = [0., 0., 0.]
 p'2(0) = [0., 1078.2, 0.]
 """
+line1 = None;
+line2 = None;
 
 def main():
     # The figure is set
     fig = plot.figure();
     axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-winDimention, winDimention), ylim=(-winDimention, winDimention));
-    line1, = axes.plot([], [], "o-b", lw=2); # Terra
-    line2, = axes.plot([], [], "o-k", lw=2); # Luna
+    #line1, = axes.plot([], [], "o-b", lw=2); # Terra
+    #line2, = axes.plot([], [], "o-k", lw=2); # Luna
+    global line1;
+    global line2;
+    line1 = plot.Circle((0, 0), 6378100, color="b");
+    line2 = plot.Circle((362600000., 0), 1737000, color="k");
+    axes.add_artist(line1);
+    axes.add_artist(line2);
     time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
     dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes);
 
     def init():
         #initialize animation
-        line1.set_data([], []);
-        line2.set_data([], []);
+        #line1;
+        #line2;
         time_text.set_text('');
         dist_text.set_text("");
         return line1, line2, time_text, dist_text;
 
     def animate(i):
         #perform animation step
-        global sys;
+        global sys, line1, line2;
         sys.step(3);
-        line1.set_data(*sys.objects[0].position);
-        line2.set_data(*sys.objects[1].position);
+        #line1.set_data(*sys.objects[0].position);
+        #line2.set_data(*sys.objects[1].position);
+        line1.remove();
+        line2.remove();
+        del line1;
+        del line2;
+        line1 = plot.Circle((sys.objects[0].position[0], sys.objects[0].position[1]), 6378100, color="b");
+        line2 = plot.Circle((sys.objects[1].position[0], sys.objects[1].position[1]), 1737000, color="k");
+        axes.add_artist(line1);
+        axes.add_artist(line2);
+        #line1.xy = sys.objects[0].position;
+        #line2.xy = sys.objects[1].position;
         time_text.set_text('time = %.1f' % sys.time_elapsed());
         dist_text.set_text("distance = %.1f" % fy.dist(sys.objects[0], sys.objects[1]));
         return line1, line2, time_text, dist_text;
