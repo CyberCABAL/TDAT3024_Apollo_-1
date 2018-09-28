@@ -1,5 +1,4 @@
 import fy
-from RungeKuttaFehlberg import RungeKuttaFehlberg54
 
 import numpy as np
 import time
@@ -8,25 +7,25 @@ import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 
 class System:
+    
     def __init__(self,
                 objects,
-                 G = 6.67408 * 10**(-11), t = 0, estimate = None, stepsize = 0.25, tol = 0.0001):
+                 G = 6.67408 * 10**(-11), t = 0, stepsize = 0.25, tol = 0.0001):
         self.GravConst = G;
         self.objects = objects;
         self.objLen = len(objects);
-        self.dim = len(objects[0].position);
+        self.dim = 2;#len(objects[0].position);
         self.h = stepsize;
         self.tol = tol;
-        self.state = np.array([np.array([t] * 2),
-                               np.array([objects[i].position[0] for i in range(self.objLen)]),
-                               np.array([objects[i].position[1] for i in range(self.objLen)]),
-                               np.array([objects[i].dirVec[0] for i in range(self.objLen)]),
-                               np.array([objects[i].dirVec[1] for i in range(self.objLen)])]);
-        #self.state = np.array([np.array([t]),
-        #                       np.array([np.array([objects[i].position[j] for i in range(self.objLen)]) for j in range(self.dim)]),
-        #                       np.array([np.array([objects[i].dirVec[j] for i in range(self.objLen)]) for j in range(self.dim)]),
-        #                       ]);
-        self.estimate = estimate;
+
+        print("dim:", self.dim);
+        
+        st = [np.array([t] * self.dim)];
+        for j in range(self.dim):
+            st.append(np.array([objects[i].position[j] for i in range(self.objLen)]));
+        for j in range(self.dim):
+            st.append(np.array([objects[i].dirVec[j] for i in range(self.objLen)]));
+        self.state = np.array(st);
 
     def time_elapsed(self):
         return self.state[0][0];
@@ -42,56 +41,30 @@ class System:
         self.objLen += 1;
 
     def stateToObjects(self):
-        p = np.array([self.state[1], self.state[2]]).T;
-        v = np.array([self.state[3], self.state[4]]).T;
-        #state1 = np.array(self.state[1]).T;
-        #state2 = np.array(self.state[2]).T;
-        self.objects[0].position = p[0];
-        self.objects[1].position = p[1];
-        self.objects[0].dirVec = v[0];
-        self.objects[1].dirVec = v[1];
-        #for i in range(self.objLen):
-        #    self.objects[i].position = state1[i];
-        #    self.objects[i].dirVec = state2[i];
-
-    def velocityVector(self, x, i = None, name = None):
-        if (i is None):
-            if (name is not None):
-                for j in range(self.objLen):
-                    if (self.objects[j].name == name):
-                        i = j;
-            else:
-                return np.zeros(3);
-        p = np.asarray(x[1]);
-        dist = self.distPos(p);
-        p0 = p[:, i];
-
-        vec = np.zeros(3);
-        for j in range(self.objLen):
-            if (i != j):
-                r = dist[i][j];     # Can be simplified, there is only one i.
-                if (r == 0):
-                    r = 0.1;
-                vec += (self.objects[j].gm * (p[:, j] - p0)) / (r * r * r);
-        return vec;
+        p = [];
+        for i in range(1, 1 + self.dim):
+            p.append(self.state[i]);
+        p = np.array(p).T;
+        v = [];
+        for i in range(-self.dim, 0):
+            v.append(self.state[i]);
+        v = np.array(v).T;
+        for i in range(self.dim):
+            self.objects[i].position = p[i];
+            self.objects[i].dirVec = v[i];
 
     def distPos(self, x):
         return [[self.__tempSum(x, n, m)**(1.5) for m in range(self.objLen)] for n in range(self.objLen)];
 
     def __tempSum(self, x, n, m):
         sum0 = 0;
-        for i in range(1, 3):    #self.dim
+        for i in range(1, self.dim + 1):
             temp = x[i][m] - x[i][n];
             sum0 += temp * temp;
         return sum0;
 
     def updateState(self, state):
         self.state = state;
-        
-    #def ydot(self, x):
-    #    x = x;
-    #    v = np.array([self.velocityVector(x, i) for i in range(self.objLen)]);
-    #    return np.array([[1], x[1], v.T]);
 
     def force(self, p, dist, Gm):
         result = [];
@@ -105,14 +78,14 @@ class System:
 
     def ydot(self, x):
         Gm = np.array([o.mass for o in self.objects]) * self.GravConst;
-        px = x[1];
-        py = x[2];
-        vx = x[3];
-        vy = x[4];
         dist = self.distPos(x);
-        #dist = [[((px[m] - px[n])**2 + (py[m] - py[n])**2)**(1.5) for m in range(self.objLen)]
-        #        for n in range(self.objLen)];
-        return np.array([np.ones(2), x[3], x[4], self.force(px, dist, Gm), self.force(py, dist, Gm)]);
+        res = [np.ones(self.dim)];
+        for i in range(-self.dim, 0):
+            res.append(x[i]);
+        for i in range(1, 1 + self.dim):
+            res.append(self.force(x[i], dist, Gm));
+        return np.array(res);
+        #return np.array([np.ones(self.dim), x[3], x[4], self.force(x[1], dist, Gm), self.force(x[2], dist, Gm)]);
 
     def rk_safestep(self):
         W, E = self.rk_step(self.h);
@@ -123,14 +96,14 @@ class System:
                 s = 2;
             else:
                 s = math.pow(self.tol * self.h / (2 * E), 0.25);
-            self.h = s * self.h;
+            self.h *= s;
 
             W, E = self.rk_step(self.h);
         # If the error is still not tolerable
         counter = 0;
         while (not (E < self.tol)):
             # Try if dividing the steplength with 2 helps.
-            self.h = self.h/2;
+            self.h /= 2;
             W, E = self.rk_step(self.h);
             counter += 1;
             if (counter > 10):
@@ -142,14 +115,14 @@ class System:
             s = 2;
         else:
             s = math.pow(self.tol * self.h / (2 * E), 0.25);
-        self.h = s * self.h;
+        self.h *= s;
 
-        #Update self
-        return W, E
+        return W, E;
         #self.stateToObjects();
 
     def rk_step(self, h):
         x = self.state
+        
         s1 = self.ydot(x)
         s2 = self.ydot(x+h*0.25*s1)
         s3 = self.ydot(x+h*(3/32*s1 + 9/32*s2))
@@ -164,48 +137,12 @@ class System:
 
         return w, e
 
-    """def reshape_W(self, W):
-        res = [W[0][0]];
-        p_T = np.array(W[1]).T
-        for p in p_T:
-            for p_x in p:
-                res.append(p_x);
-        v_T = np.array(W[2]).T
-        for v in v_T:
-            for v_x in v:
-                res.append(v_x);
-        return np.array(res);
-
-    def reshapeBack_W(self, W_out):
-        l = self.objLen;
-        d = self.dim;
-        res = [[W_out[0]]];
-        temp1 = [];
-        w_x = 1;
-        for j in range(l):
-            temp2 = [];
-            for i in range(w_x, w_x + d):
-                temp2.append(W_out[i]);
-                w_x += 1;
-            temp1.append(temp2);
-        res.append(np.array(temp1).T.tolist());
-        temp1 = [];
-        for j in range(l):
-            temp2 = [];
-            for i in range(w_x, w_x + d):
-                temp2.append(W_out[i]);
-                w_x += 1;
-            temp1.append(temp2);
-        res.append(np.array(temp1).T.tolist());
-        return np.array(res);"""
-
     def step(self, rate = 3):
-        W, E = self.rk_safe_step();
+        W, E = self.rk_safestep();
         self.updateState(W);
         for i in range(rate - 1):
-            W, E = self.rk_safe_step();
+            W, E = self.rk_safestep();
             self.updateState(W);
-        self.updateState(W);
         self.stateToObjects();
         return W, E;
                           

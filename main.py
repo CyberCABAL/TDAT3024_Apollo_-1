@@ -1,18 +1,16 @@
 from fy import CelestialObject
 from orbitalsys import System
-from RungeKuttaFehlberg import RungeKuttaFehlberg54
 
 import numpy as np
 import time
 import fy
 import matplotlib.pyplot as plot
 import matplotlib.animation as animation
-import matplotlib.patches as patch
 
 dt = 1./30 # 30 frames per second
 tol = 05e-14;
-sys = System([CelestialObject([0., 0., 0.], [0., 0., 0.], 5.9722 * 10**24, 6378100, "Terra"),
-              CelestialObject([362600000., 0., 0.], [0., 1078.2, 0.], 7.34767309 * 10**22, 1737000, "Luna")], stepsize = dt, tol = tol);
+sys = System([CelestialObject([0., 0.], [0., 0.], 5.9722 * 10**24, 6378100, "Terra"),
+              CelestialObject([362600000., 0.], [0., 1078.2], 7.34767309 * 10**22, 1737000, "Luna")], stepsize = dt, tol = tol);
 winDimention = 362600000. * 2;
 """
 p'1 = v1
@@ -24,22 +22,9 @@ p1(0) = [0,0,0]
 p2(0) = [362600., 0., 0.]
 p'1(0) = [0., 0., 0.]
 p'2(0) = [0., 1078.2, 0.]
-
-dim = 5
-W = [0, 0, 0, 0, 362600 0, 0, 0, 0, 0, 0, 1078.2, 0]
 """
 
 def main():
-
-    #F = lambda x
-
-    #W, E = rkf54.safeStep(W);
-    #rkf54.setStepLength(tEnd - W[0]);
-    #W, E = rkf54.step(W);
-
-    #print(W, E);
-    #print("Total error: ", [abs(W[1] - y_1(1)), abs(W[2] - y_2(1))]);
-
     # The figure is set
     fig = plot.figure();
     axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-winDimention, winDimention), ylim=(-winDimention, winDimention));
