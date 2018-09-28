@@ -18,7 +18,7 @@ class System:
         self.h = stepsize;
         self.tol = tol;
 
-        print("dim:", self.dim);
+        #print("dim:", self.dim);
         
         st = [np.array([t] * self.dim)];
         for j in range(self.dim):
