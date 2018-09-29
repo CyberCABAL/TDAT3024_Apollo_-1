@@ -120,7 +120,7 @@ def main(tolerance):
     y_1(t) = e**t * cos(t), y_2(t) = -e**t * sin(t)
     """
     w = np.array([0, 1, 0])
-    h = 0.25
+    h = 0.010
     tol = tolerance
     t_end = 1.0
     rkf54 = RungeKuttaFehlberg54(func, 3, h, tol)
@@ -145,7 +145,7 @@ if __name__ == "__main__":
         [],  # Total error
     ]
 
-    for i in range(0, 20):
+    for i in range(4, 20):
         tolerance = 10**-i
         t1 = time.time()
         result, total_error = main(tolerance)
@@ -158,13 +158,15 @@ if __name__ == "__main__":
 
     fig, ax1 = plt.subplots()
     ax1.plot(data[0], data[1], "b.", lw=0, ms=6)
-    ax1.set_xlabel("Tolerance")
-    ax1.set_ylabel("Runtime (s)", color="b")
+    ax1.set_xlabel("Toleranse")
+    ax1.set_ylabel("Beregningstid (s)", color="b")
+    # ax1.set_yscale("log")
     ax1.tick_params("y", colors="b")
 
     ax2 = ax1.twinx()
     ax2.plot(data[0], data[3], "r.", lw=0, ms=3)
-    ax2.set_ylabel("Error", color="r")
+    ax2.set_ylabel("Akkumulert feil", color="r")
+    ax2.set_yscale("log")
     ax2.tick_params("y", colors="r")
 
     fig.tight_layout()
