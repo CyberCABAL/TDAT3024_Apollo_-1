@@ -8,8 +8,10 @@ Created on Thu Aug 30 20:26:05 2018
 
 import math as m
 import sys
+import time
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class RungeKuttaFehlberg54:
@@ -107,7 +109,7 @@ def y_2(t):
     return -m.e**t * m.sin(t)
 
 
-def main():
+def main(tolerance):
     """ 6.3.1.a
     h = 0.25, [0,1]
     y'1 = y_1 + y_2
@@ -119,7 +121,7 @@ def main():
     """
     w = np.array([0, 1, 0])
     h = 0.25
-    tol = 05e-14
+    tol = tolerance
     t_end = 1.0
     rkf54 = RungeKuttaFehlberg54(func, 3, h, tol)
 
@@ -129,11 +131,44 @@ def main():
     rkf54.set_step_length(t_end - w[0])
     w, error = rkf54.step(w)
 
-    print(w, error)
-    
-    print("Total error: ", [abs(w[1] - y_1(1)), abs(w[2] - y_2(1))])
+    result = [w[1], w[2]]
+    total_error = [abs(w[1] - y_1(1)), abs(w[2] - y_2(1))]
+    return result, total_error
     
     
 if __name__ == "__main__":
     # execute only if run as a script
-    main()
+    data = [
+        [],  # Tolerance
+        [],  # Runtime
+        [],  # Result
+        [],  # Total error
+    ]
+
+    for i in range(0, 20):
+        tolerance = 10**-i
+        t1 = time.time()
+        result, total_error = main(tolerance)
+        t2 = time.time()
+        runtime = t2-t1
+        data[0].append(tolerance)
+        data[1].append(runtime)
+        data[2].append(result)
+        data[3].append(total_error)
+
+    fig, ax1 = plt.subplots()
+    ax1.plot(data[0], data[1], "b.", lw=0, ms=6)
+    ax1.set_xlabel("Tolerance")
+    ax1.set_ylabel("Runtime (s)", color="b")
+    ax1.tick_params("y", colors="b")
+
+    ax2 = ax1.twinx()
+    ax2.plot(data[0], data[3], "r.", lw=0, ms=3)
+    ax2.set_ylabel("Error", color="r")
+    ax2.tick_params("y", colors="r")
+
+    fig.tight_layout()
+
+    plt.xscale("log")
+    plt.grid(True)
+    plt.show()
