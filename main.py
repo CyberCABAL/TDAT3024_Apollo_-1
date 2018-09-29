@@ -43,19 +43,13 @@ def main():
     time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
     dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes);
 
-    trail, = axes.plot([], [], "o-r", lw=1, ms=6378100/100000000, label='trail')
-
-    trailx = [sys.objects[0].position[0]]
-    traily = [sys.objects[0].position[1]]
-
     def init():
         #initialize animation
         #line1;
         #line2;
-        trail.set_data([], [])
         time_text.set_text('');
         dist_text.set_text("");
-        return line1, line2, time_text, dist_text, trail;
+        return line1, line2, time_text, dist_text;
 
     def animate(i):
         #perform animation step
@@ -71,14 +65,11 @@ def main():
         line2 = plot.Circle((sys.objects[1].position[0], sys.objects[1].position[1]), 1737000, color="k");
         axes.add_artist(line1);
         axes.add_artist(line2);
-        trailx.append(sys.objects[0].position[0]);
-        traily.append(sys.objects[0].position[1]);
-        trail.set_data(trailx, traily)
         #line1.xy = sys.objects[0].position;
         #line2.xy = sys.objects[1].position;
         time_text.set_text('time = %.1f' % (sys.time_elapsed()/86400) + " days");
         dist_text.set_text("distance = %.1f" % fy.dist(sys.objects[0], sys.objects[1]));
-        return line1, line2, time_text, dist_text, trail;
+        return line1, line2, time_text, dist_text;
 
     # choose the interval based on dt and the time to animate one step
     # Take the time for one call of the animate.
