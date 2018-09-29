@@ -187,7 +187,7 @@ grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius+100, 0.00001, 10]
+rocket = [0, 0, earth_radius+100, 0.00002, 10]
 init = np.array([
     np.array([0.0, 0]),
     np.array([planet[1], rocket[1]]),
