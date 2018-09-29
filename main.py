@@ -8,7 +8,7 @@ import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 
 dt = 1./30 # 30 frames per second
-tol = 05e-14;
+tol = 3e-14;
 x_0 = -6378100 * 2/3;
 dy_0 = -13.098;
 sys = System([CelestialObject([x_0, 0.], [0., dy_0], 5.9722 * 10**24, 6378100, "Terra"),
@@ -60,7 +60,7 @@ def main():
     def animate(i):
         #perform animation step
         global sys, line1, line2;
-        sys.step(3);
+        sys.step(4);
         #line1.set_data(*sys.objects[0].position);
         #line2.set_data(*sys.objects[1].position);
         line1.remove();
@@ -76,7 +76,7 @@ def main():
         trail.set_data(trailx, traily)
         #line1.xy = sys.objects[0].position;
         #line2.xy = sys.objects[1].position;
-        time_text.set_text('time = %.1f' % sys.time_elapsed());
+        time_text.set_text('time = %.1f' % (sys.time_elapsed()/86400) + " days");
         dist_text.set_text("distance = %.1f" % fy.dist(sys.objects[0], sys.objects[1]));
         return line1, line2, time_text, dist_text, trail;
 
