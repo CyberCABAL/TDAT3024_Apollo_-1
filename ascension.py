@@ -4,6 +4,7 @@ import matplotlib.pyplot as plot
 import numpy as np
 import fy
 import math
+import sys
 from fy import CelestialObject
 from SaturnV import SaturnV
 
@@ -18,6 +19,7 @@ class Ascension(object):
         self.state = np.array(init_state)
         self.h = stepsize
         self.tol = tolerance
+        #self.stop = [False, False];
 
     def position(self):
         return [(self.state[1][n], self.state[2][n]) for n in range(self.planets)]
@@ -96,7 +98,48 @@ class Ascension(object):
         s2 = self.ydot(np.array([(np.array(f) * h) for f in s1]) + x)
         self.state = x + h * (s1 + s2) / 2
 
-    #Actually acceleration
+    def a_G(self, p, dist3, dist, Gm):
+        result = [];
+        for n in range(self.planets):
+            tempSum = 0;
+            #if (not self.stop[n]):
+            for m in range(self.planets):
+            #if (not self.stop[m]):
+                if (n != m and dist[n][m] > earth_radius):
+                    tempSum += (Gm[m] * (p[m] - p[n])) / (dist3[n][m]);
+                elif n != m and dist[n][m] < earth_radius:
+                    # Object has crashed into the earth. Velocity is removed.
+                    #self.stop[n] = True;
+                    self.state[3][1] = 0;
+                    self.state[4][1] = 0;
+                    self.mass[1] = 0;
+            result.append(tempSum);
+        return np.array(result);
+
+    def a_R(self, v_R, t):  #Rocket
+        l = np.linalg.norm(v_R, 2);
+        if (l == 0):
+            return 0;
+        #print("v_R:", v_R / l, " a:", (saturn_v.get_force(t) / saturn_v.get_mass(t)), " t:", t);
+        #print("Produkt:", (v_R / l) * (saturn_v.get_force(t) / saturn_v.get_mass(t)));
+        return (v_R / l) * (saturn_v.get_force(t) / saturn_v.get_mass(t));
+
+    def Σa(self, x, dist):
+        v_R = np.array([x[3][1], x[4][1]]);
+        Gm = self.mass * self.grav_const;
+        dist3 = [[dist[n][m] ** 3 for m in range(self.planets)] for n in range(self.planets)];
+        
+        #print(self.a_R(v_R, self.time_elapsed()));
+        a = [self.a_G(x[1], dist3, dist, Gm), self.a_G(x[2], dist3, dist, Gm)];
+        #print("a:", a);
+        a_R = self.a_R(v_R, self.time_elapsed());
+        a[0][1] += a_R[0];
+        a[1][1] += a_R[1];
+        #print("a0:", a[0][1], "a1:", a[1][1]);
+        return a;
+        
+
+    """#Actually acceleration
     def force(self, p, dist):
         G = self.grav_const
         mass = self.mass
@@ -127,26 +170,24 @@ class Ascension(object):
                     # temp_sum += -F / mass[n]
 
             result.append(temp_sum)
-        return np.array(result)
+        return np.array(result)"""
 
     def ydot(self, x):
         px = x[1]
         py = x[2]
-        vx = x[3]
-        vy = x[4]
         dist = [[((px[m] - px[n]) ** 2 + (py[m] - py[n]) ** 2) ** 0.5 for m in range(self.planets)] for n in range(self.planets)]
+        Σ = self.Σa(x, dist);
+        return np.array([np.ones(self.planets), x[3], x[4], Σ[0], Σ[1]]);
 
-        return np.array([np.ones(self.planets), vx, vy, self.force(px, dist), self.force(py, dist)])
 
-
-earth_radius = 6.371 * 10**6
+earth_radius = 6378100
 earth_mass = 5.972 * 10**24
 rocket_mass = 2.97 * 10**6
 grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius+10, 10, 0]
+rocket = [0, 0, earth_radius+100, 0.00001, 10]
 init = np.array([
     np.array([0.0, 0]),
     np.array([planet[1], rocket[1]]),
