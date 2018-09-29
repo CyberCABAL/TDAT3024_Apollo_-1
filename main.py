@@ -9,8 +9,10 @@ import matplotlib.animation as animation
 
 dt = 1./30 # 30 frames per second
 tol = 05e-14;
-sys = System([CelestialObject([0., 0.], [0., -15.], 5.9722 * 10**24, 6378100, "Terra"),
-              CelestialObject([362600000., 0.], [0., 1078.2], 7.34767309 * 10**22, 1737000, "Luna")], stepsize = dt, tol = tol);
+x_0 = -6378100 * 2/3;
+dy_0 = -13.098;
+sys = System([CelestialObject([x_0, 0.], [0., dy_0], 5.9722 * 10**24, 6378100, "Terra"),
+              CelestialObject([362000000.+ x_0, 0.], [0., 1078.2 + dy_0], 7.34767309 * 10**22, 1737000, "Luna")], stepsize = dt, tol = tol);
 winDimention = 362600000. * 3/2;
 """
 p'1 = v1
@@ -41,13 +43,19 @@ def main():
     time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
     dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes);
 
+    trail, = axes.plot([], [], "o-r", lw=1, ms=6378100/100000000, label='trail')
+
+    trailx = [sys.objects[0].position[0]]
+    traily = [sys.objects[0].position[1]]
+
     def init():
         #initialize animation
         #line1;
         #line2;
+        trail.set_data([], [])
         time_text.set_text('');
         dist_text.set_text("");
-        return line1, line2, time_text, dist_text;
+        return line1, line2, time_text, dist_text, trail;
 
     def animate(i):
         #perform animation step
@@ -63,11 +71,14 @@ def main():
         line2 = plot.Circle((sys.objects[1].position[0], sys.objects[1].position[1]), 1737000, color="k");
         axes.add_artist(line1);
         axes.add_artist(line2);
+        trailx.append(sys.objects[0].position[0]);
+        traily.append(sys.objects[0].position[1]);
+        trail.set_data(trailx, traily)
         #line1.xy = sys.objects[0].position;
         #line2.xy = sys.objects[1].position;
         time_text.set_text('time = %.1f' % sys.time_elapsed());
         dist_text.set_text("distance = %.1f" % fy.dist(sys.objects[0], sys.objects[1]));
-        return line1, line2, time_text, dist_text;
+        return line1, line2, time_text, dist_text, trail;
 
     # choose the interval based on dt and the time to animate one step
     # Take the time for one call of the animate.
