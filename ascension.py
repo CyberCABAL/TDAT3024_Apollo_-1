@@ -125,24 +125,25 @@ class Ascension(object):
     def get_h(self, x, r_index):  #Height
         return np.linalg.norm([x[1][0] - x[1][r_index], x[2][0] - x[2][r_index]], 2) - earth_radius;
 
-    def a_Atmos(self, v_R, t, r_index, x):  #Resistance
+    def a_Atmos(self, v_R, t, h, r_index):  #Resistance
         l = np.linalg.norm(v_R, 2);
         if (l == 0):
             return 0;
-        return (v_R / l) * (fy.F_d_h(0.5, self.get_h(x, r_index), saturn_v.get_area(t), l) / saturn_v.get_mass(t));
+        return -(v_R / l) * (fy.F_d_h(0.5, h, saturn_v.get_area(t), l) / saturn_v.get_mass(t));
 
     def Σa(self, x, dist, r_index):
         v_R = np.array([x[3][r_index], x[4][r_index]]);
         Gm = self.mass * self.grav_const;
+        h = self.get_h(x, r_index);
+        t = self.time_elapsed();
         dist3 = [[dist[n][m] ** 3 for m in range(self.planets)] for n in range(self.planets)];
-        #print(self.a_R(v_R, self.time_elapsed()));
+
         a = [self.a_G(x[1], dist3, dist, Gm, r_index), self.a_G(x[2], dist3, dist, Gm, r_index)];
-        #print("a:", a);
-        a_R = self.a_R(v_R, self.time_elapsed());
-        a_A = self.a_Atmos(v_R, self.time_elapsed(), r_index, x);
+        a_R = self.a_R(v_R, t);
+        a_A = self.a_Atmos(v_R, t, h, r_index);
+        #print("a_A:", a_A)
         a[0][r_index] += a_R[0] + a_A[0];
         a[1][r_index] += a_R[1] + a_A[1];
-        #print("a0:", a[0][1], "a1:", a[1][1]);
         return a;
         
 
