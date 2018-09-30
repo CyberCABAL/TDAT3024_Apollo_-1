@@ -84,7 +84,7 @@ def main():
                             frames=3000, # total number of frames 
                             interval=delay, # time to wait between each frame.
                             repeat=False,
-                            blit=True, 
+                            blit=False,
                             init_func=init # initialization
                             );
 
