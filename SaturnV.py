@@ -163,6 +163,7 @@ class SaturnV(object):
 def main():
     saturn_v = SaturnV()
     saturn_v.saturn_v_info()
+    #print(saturn_v.get_mass(170)
     
     print("\nTotalmasse i starten av steg 1: ",saturn_v.get_step_start_mass(0), "kg")
     print("\nTotalmasse i starten av steg 2: ",saturn_v.get_step_start_mass(1), "kg")

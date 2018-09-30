@@ -49,11 +49,11 @@ def F_d_h(C_d, h, A, v):
 
 # Density of atmosphere
 def ρ_atmos(p_air, T):
-    return p_air * 3.4855 / T
+    return (p_air * 3.4855 / T)
 
 # Density of atmosphere
 def ρ_atmos_h(h):
-    return p_air(h) * 3.4855 / T(h);
+    return (p_air(h) * 3.4855 / T(h))/1000;
 
 
 # Temperature at height h
