@@ -12,13 +12,15 @@ from SaturnV import SaturnV
 class Ascension(object):
     def __init__(self, init_state, grav_const, mass, planets,
                  stepsize=0.15,
-                 tolerance=05e-14):
+                 tolerance=05e-14,
+                 r_index=1):
         self.grav_const = grav_const
         self.mass = mass
         self.planets = planets
         self.state = np.array(init_state)
         self.h = stepsize
         self.tol = tolerance
+        self.r_index = r_index;
         #self.stop = [False, False];
 
     def position(self):
@@ -81,14 +83,12 @@ class Ascension(object):
         return w, e
 
     def step(self, h):
-        self.mass[1] = saturn_v.get_mass(self.time_elapsed())
-
         x = self.state
         s1 = self.ydot(x)
         s2 = self.ydot(np.array([(np.array(f) * h) for f in s1]) + x)
         self.state = x + h * (s1 + s2) / 2
 
-    def a_G(self, p, dist3, dist, Gm, r_index):
+    def a_G(self, p, dist3, dist, Gm):
         result = [];
         for n in range(self.planets):
             tempSum = 0;
@@ -100,46 +100,47 @@ class Ascension(object):
                 elif n != m and dist[n][m] < earth_radius:
                     # Object has crashed into the earth. Velocity is removed.
                     #self.stop[n] = True;
-                    self.state[3][r_index] = 0;
-                    self.state[4][r_index] = 0;
-                    self.mass[r_index] = 0;
+                    self.state[3][self.r_index] = 0;
+                    self.state[4][self.r_index] = 0;
+                    self.mass[self.r_index] = 0;
             result.append(tempSum);
         return np.array(result);
 
     def a_R(self, v_R, t):  #Rocket
         l = np.linalg.norm(v_R, 2);
-        if (l == 0):
-            return 0;
-        return (v_R / l) * (saturn_v.get_force(t) / saturn_v.get_mass(t));
+        if (l == 0 or self.mass[self.r_index] == 0):
+            return [0, 0];
+        return (v_R / l) * (saturn_v.get_force(t) / self.mass[self.r_index]);
 
-    def get_h(self, x, r_index):  #Height
-        return np.linalg.norm([x[1][0] - x[1][r_index], x[2][0] - x[2][r_index]], 2) - earth_radius;
+    def get_h(self, x):  #Height
+        return np.linalg.norm([x[1][0] - x[1][self.r_index], x[2][0] - x[2][self.r_index]], 2) - earth_radius;
 
-    def a_Atmos(self, v_R, t, h, r_index):  #Resistance
+    def a_Atmos(self, v_R, t, h):  #Resistance
         l = np.linalg.norm(v_R, 2);
-        if (l == 0):
-            return 0;
-        return -(v_R / l) * (fy.F_d_h(0.5, h, saturn_v.get_area(t), l) / saturn_v.get_mass(t));
+        if (l == 0 or self.mass[self.r_index] == 0):
+            return [0, 0];
+        return -(v_R / l) * (fy.F_d_h(0.5, h, saturn_v.get_area(t), l) / self.mass[self.r_index]);
 
-    def Σa(self, x, dist, r_index):
-        v_R = np.array([x[3][r_index], x[4][r_index]]);
+    def Σa(self, x, dist):
+        v_R = np.array([x[3][self.r_index], x[4][self.r_index]]);
         Gm = self.mass * self.grav_const;
-        h = self.get_h(x, r_index);
+        h = self.get_h(x);
         t = self.time_elapsed();
         dist3 = [[dist[n][m] ** 3 for m in range(self.planets)] for n in range(self.planets)];
 
-        a = [self.a_G(x[1], dist3, dist, Gm, r_index), self.a_G(x[2], dist3, dist, Gm, r_index)];
+        a = [self.a_G(x[1], dist3, dist, Gm), self.a_G(x[2], dist3, dist, Gm)];
         a_R = self.a_R(v_R, t);
-        a_A = self.a_Atmos(v_R, t, h, r_index);
-        a[0][r_index] += a_R[0] + a_A[0];
-        a[1][r_index] += a_R[1] + a_A[1];
+        a_A = self.a_Atmos(v_R, t, h);
+        a[0][self.r_index] += a_R[0] + a_A[0];
+        a[1][self.r_index] += a_R[1] + a_A[1];
         return a;
 
     def ydot(self, x):
+        self.mass[self.r_index] = saturn_v.get_mass(self.time_elapsed());
         px = x[1]
         py = x[2]
         dist = [[((px[m] - px[n]) ** 2 + (py[m] - py[n]) ** 2) ** 0.5 for m in range(self.planets)] for n in range(self.planets)]
-        Σ = self.Σa(x, dist, 1);
+        Σ = self.Σa(x, dist);
         return np.array([np.ones(self.planets), x[3], x[4], Σ[0], Σ[1]]);
 
 
@@ -150,7 +151,7 @@ grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius+10, 0.000002, 1]
+rocket = [0, 0, earth_radius+10, 0.00000, 1]
 init = np.array([
     np.array([0.0, 0]),
     np.array([planet[1], rocket[1]]),
@@ -226,7 +227,7 @@ def animate(i):
     time_text.set_text('time = %.2f' % orbit.time_elapsed())
     posx_text.set_text('posx =  %.3e' % orbit.position()[1][0])
     posy_text.set_text('posy =  %.3e' % orbit.position()[1][1])
-    h_text.set_text('h =  %.3e' % orbit.get_h(orbit.state, 1))
+    h_text.set_text('h =  %.3e' % orbit.get_h(orbit.state))
     return line1, line2, time_text, posx_text, posy_text, trail, h_text
 
 
