@@ -179,6 +179,7 @@ line2, = axes.plot([], [], "2-r", lw=0, ms=earth_radius/1000000, label='Rocket')
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes)
 posx_text = axes.text(0.02, 0.90, "", transform=axes.transAxes)
 posy_text = axes.text(0.02, 0.85, "", transform=axes.transAxes)
+h_text = axes.text(0.02, 0.80, "", transform=axes.transAxes)
 legend = axes.legend(loc='lower right')
 for legend_handle in legend.legendHandles:
     legend_handle._legmarker.set_markersize(6)
@@ -195,7 +196,8 @@ def init():
     time_text.set_text('')
     posx_text.set_text('')
     posy_text.set_text('')
-    return line1, line2, time_text, posx_text, posy_text, trail
+    h_text.set_text('')
+    return line1, line2, time_text, posx_text, posy_text, trail, h_text
 
 
 def animate(i):
@@ -224,7 +226,8 @@ def animate(i):
     time_text.set_text('time = %.2f' % orbit.time_elapsed())
     posx_text.set_text('posx =  %.3e' % orbit.position()[1][0])
     posy_text.set_text('posy =  %.3e' % orbit.position()[1][1])
-    return line1, line2, time_text, posx_text, posy_text, trail
+    h_text.set_text('h =  %.3e' % orbit.get_h(orbit.state, 1))
+    return line1, line2, time_text, posx_text, posy_text, trail, h_text
 
 
 # choose the interval based on dt and the time to animate one step
