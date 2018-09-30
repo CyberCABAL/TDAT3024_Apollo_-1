@@ -30,6 +30,7 @@ Hastighet:  4566.21  m/s
 Skyvekraft:  1000000  N
 '''
 
+import math
 
 class SaturnV(object):
     '''
@@ -39,6 +40,7 @@ class SaturnV(object):
         step_mass_without_fuel: En tabell med massen til hvert steg uten drivstoff
         step_force: En tabell med skyvekraften i hvert steg
         step_time: En tabell med tiden hvert steg tar
+        step_diameter: En tabell med diameteren i hvert steg. Den siste verdien er diametern i kommandomodulen
 
     Standardverdiene som er lagt inn i konstruktøren er hentet fra https://en.wikipedia.org/wiki/Saturn_V
     '''
@@ -47,12 +49,14 @@ class SaturnV(object):
                  step_total_mass=[2290 * 10 ** 3, 496.2 * 10 ** 3, 123 * 10 ** 3],
                  step_mass_without_fuel=[130 * 10 ** 3, 40.1 * 10 ** 3, 13.5 * 10 ** 3],
                  step_force=[35100 * 10 ** 3, 5141 * 10 ** 3, 1000 * 10 ** 3],
-                 step_time=[168, 360, 500]):
+                 step_time=[168, 360, 500],
+                 step_diameter=[10.1, 10.1, 6.6, 3.9]):
         self.mass = total_mass
         self.step_mass = step_total_mass
         self.step_mass_without_fuel = step_mass_without_fuel
         self.step_force = step_force
         self.step_time = step_time
+        self.step_diameter = step_diameter
 
     def get_fuel(self, x):
         # Finner hvor mye drivstoff et steg har i kg
@@ -140,16 +144,34 @@ class SaturnV(object):
             else:
                 raise ValueError('Velg en t i intervallet [0, ->]')
 
+    def get_area(self, t):
+        # Denne funksjonen ble lagt til med tanke på atmosfæren i oppgave 6.
+        # Den returnerer arealet til raketten etter t sekunder.
+        if 0 <= t <= (self.step_time[0]+self.step_time[1]+self.step_time[2]):
+            if t <= self.step_time[0]:
+                return (((self.step_diameter[0]/2)**2)*math.pi)
+            if self.step_time[0] < t <= (self.step_time[0]+self.step_time[1]):
+                return (((self.step_diameter[1]/2)**2)*math.pi)
+            else:
+                return (((self.step_diameter[2]/2)**2)*math.pi)
+        else:
+            if t > (self.step_time[0]+self.step_time[1]+self.step_time[2]):
+                return (((self.step_diameter[3]/2)**2)*math.pi)
+            else:
+                raise ValueError('Velg en t i intervallet [0, ->]')
+
 def main():
     saturn_v = SaturnV()
     saturn_v.saturn_v_info()
-
+    
     print("\nTotalmasse i starten av steg 1: ",saturn_v.get_step_start_mass(0), "kg")
     print("\nTotalmasse i starten av steg 2: ",saturn_v.get_step_start_mass(1), "kg")
     print("\nTotalmasse i starten av steg 3: ",saturn_v.get_step_start_mass(2), "kg")
 
     print("\nMasse ved ulike t-verdier")
     saturn_v.mass_table()
+
+    
 
 if __name__ == "__main__":
     main();
