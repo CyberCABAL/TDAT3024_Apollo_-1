@@ -35,13 +35,20 @@ def dist(x_0, x_1):
 
 
 # Force of drag
-def F_d(C_d, p_air, A, v):
-    return (C_d * p_air * A * v * v) / 2
+def F_d(C_d, ρ_air, A, v):
+    return (C_d * ρ_air * A * v * v) / 2
 
+# Force of drag
+def F_d_h(C_d, h, A, v):
+    return (C_d * ρ_atmos_h(h) * A * v * v) / 2
 
 # Density of atmosphere
 def ρ_atmos(p_air, T):
     return p_air * 3.4855 / T
+
+# Density of atmosphere
+def ρ_atmos_h(h):
+    return p_air(h) * 3.4855 / T(h);
 
 
 # Temperature at height h
