@@ -17,6 +17,11 @@ class CelestialObject:
         self.dirVec = np.array(dirVec)
         self.name = name
 
+class Rocket(CelestialObject):
+    pass
+
+    
+
 # Total force of gravity
 def F_G(x_0, x_1):
     r = dist(x_0, x_1)

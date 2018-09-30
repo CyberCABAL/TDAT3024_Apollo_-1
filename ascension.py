@@ -125,7 +125,7 @@ class Ascension(object):
     def get_h(self, x, r_index):  #Height
         return np.linalg.norm([x[1][0] - x[1][r_index], x[2][0] - x[2][r_index]], 2) - earth_radius;
 
-    def a_Atmos(self, v_R, t, r_index):  #Resistance
+    def a_Atmos(self, v_R, t, r_index, x):  #Resistance
         l = np.linalg.norm(v_R, 2);
         if (l == 0):
             return 0;
@@ -139,7 +139,7 @@ class Ascension(object):
         a = [self.a_G(x[1], dist3, dist, Gm, r_index), self.a_G(x[2], dist3, dist, Gm, r_index)];
         #print("a:", a);
         a_R = self.a_R(v_R, self.time_elapsed());
-        a_A = a_Atmos(v_R, t, r_index);
+        a_A = self.a_Atmos(v_R, self.time_elapsed(), r_index, x);
         a[0][r_index] += a_R[0] + a_A[0];
         a[1][r_index] += a_R[1] + a_A[1];
         #print("a0:", a[0][1], "a1:", a[1][1]);
@@ -194,7 +194,7 @@ grav_const = 6.67408 * 10**-11
 
 # init_state is [t0,x0,y0,vx0,vy0]
 planet = [0, 0, 0, 0, 0]
-rocket = [0, 0, earth_radius+10, 0.000000000095, 1]
+rocket = [0, 0, earth_radius+10, 0.000002, 1]
 init = np.array([
     np.array([0.0, 0]),
     np.array([planet[1], rocket[1]]),
