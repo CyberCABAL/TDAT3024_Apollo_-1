@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from SaturnV import SaturnV
 
 G = 6.67408 * 10**(-11)
 
@@ -18,8 +19,48 @@ class CelestialObject:
         self.name = name
 
 class Rocket(CelestialObject):
-    pass
+    def __init__(self,
+                 position = [0, 0, 0],
+                 dirVec = [0, 0, 0],
+                 mass = 1,
+                 A = 1,
+                 name = "Saturn V",
+                 system_init = [0, 0, 0],
+                 force = 1,
+                 C_d = 0.5,
+                 stop = False):
+        CelestialObject.__init__(self, position, dirVec, mass, 1, name);
+        self.system_init = system_init;
+        self.A = A;
+        self.s_V = SaturnV();
+        self.force = force;
+        self.C_d = C_d;
+        self.stop = stop;
 
+    def update(self, t):
+        if (not self.stop):
+            self.mass = self.s_V.get_mass(t);
+            self.A = self.s_V.get_area(t);
+            self.force = self.s_V.get_force(t);
+        else:
+            self.mass = 0;
+            self.force = 0;
+            self.dirVec = [0] * len(self.dirVec);
+
+    def a_R(self):
+        l = np.linalg.norm(self.dirVec, 2);
+        if (l == 0 or self.mass == 0):
+            return np.array([0] * len(self.dirVec));
+        return (self.dirVec / l) * (self.force / self.mass);
+
+    def get_h(self, planet):  #Height
+        return np.linalg.norm(planet.position - self.position, 2) - planet.r;
+
+    def a_Atmos(self, planet):  #Resistance
+        l = np.linalg.norm(np.array(self.dirVec) - np.array(self.system_init), 2);
+        if (l == 0 or self.mass == 0):
+            return np.array([0] * len(self.dirVec));
+        return -(self.dirVec / l) * (F_d_h(self.C_d, self.get_h(planet), self.A, l) / self.mass);
     
 
 # Total force of gravity
@@ -49,11 +90,11 @@ def F_d_h(C_d, h, A, v):
 
 # Density of atmosphere
 def ρ_atmos(p_air, T):
-    return (p_air * 3.4855 / T)
+    return (p_air * 3.4855) / (T * 1000)
 
 # Density of atmosphere
 def ρ_atmos_h(h):
-    return (p_air(h) * 3.4855 / T(h))/1000;
+    return (p_air(h) * 3.4855) / (T(h) * 1000);
 
 
 # Temperature at height h

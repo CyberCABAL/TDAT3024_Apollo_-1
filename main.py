@@ -1,4 +1,5 @@
 from fy import CelestialObject
+from fy import Rocket
 from orbitalsys import System
 
 import numpy as np
@@ -11,9 +12,14 @@ dt = 1./30 # 30 frames per second
 tol = 3e-14;
 x_0 = -6378100 * 2/3;
 dy_0 = -13.098;
-sys = System([CelestialObject([x_0, 0.], [0., dy_0], 5.9722 * 10**24, 6378100, "Terra"),
-              CelestialObject([362000000.+ x_0, 0.], [0., 1078.2 + dy_0], 7.34767309 * 10**22, 1737000, "Luna")], stepsize = dt, tol = tol);
-winDimention = 362600000. * 3/2;
+luna_distance = 362000000.;
+terra_r = 6378100;
+luna_r = 1737000;
+sys = System([CelestialObject([x_0, 0.], [0., dy_0], 5.9722 * 10**24, terra_r, "Terra"),
+              CelestialObject([luna_distance + x_0, 0.], [0., 1078.2 + dy_0], 7.34767309 * 10**22, luna_r, "Luna"),
+              Rocket([x_0, terra_r + 10], [0.05, 1], 2.97 * 10**6, 1, "Saturn V", [0., dy_0])
+              ], stepsize = dt, tol = tol);
+winDimention = luna_distance * 3/2;
 """
 p'1 = v1
 v'1 = Gm2(p2 - p1)/r**3_12
@@ -27,6 +33,14 @@ p'2(0) = [0., 1078.2, 0.]
 """
 line1 = None;
 line2 = None;
+line3 = None;
+trail = None;
+
+posx_text = None;
+posy_text = None;
+
+trailx = [sys.objects[2].position[0]];
+traily = [sys.objects[2].position[1]];
 
 def main():
     # The figure is set
@@ -34,12 +48,15 @@ def main():
     axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-winDimention, winDimention), ylim=(-winDimention, winDimention));
     #line1, = axes.plot([], [], "o-b", lw=2); # Terra
     #line2, = axes.plot([], [], "o-k", lw=2); # Luna
-    global line1;
-    global line2;
-    line1 = plot.Circle((0, 0), 6378100, color="b");
-    line2 = plot.Circle((362600000., 0), 1737000, color="k");
+    global line1, line2, line3, trail;
+    line1 = plot.Circle((0, 0), terra_r, color="b");
+    line2 = plot.Circle((luna_distance, 0), luna_r, color="k");
+    line3, = axes.plot([], [], "2-r", lw=0, ms=terra_r/1000000, label="Rocket")
+    trail, = axes.plot([], [], "o-r", lw=1, ms=terra_r/1000000000, label='trail')
     axes.add_artist(line1);
     axes.add_artist(line2);
+    posx_text = axes.text(0.02, 0.80, "", transform=axes.transAxes);
+    posy_text = axes.text(0.02, 0.85, "", transform=axes.transAxes);
     time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
     dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes);
 
@@ -47,14 +64,18 @@ def main():
         #initialize animation
         #line1;
         #line2;
-        time_text.set_text('');
+        line3.set_data([], []);
+        time_text.set_text("");
         dist_text.set_text("");
-        return line1, line2, time_text, dist_text;
+        posx_text.set_text("")
+        posy_text.set_text("")
+        trail.set_data([], [])
+        return line1, line2, line3, time_text, dist_text, trail, posx_text, posy_text;
 
     def animate(i):
         #perform animation step
-        global sys, line1, line2;
-        sys.step(4);
+        global sys, line1, line2, line3, trail;
+        sys.step(6);    #originally 4
         #line1.set_data(*sys.objects[0].position);
         #line2.set_data(*sys.objects[1].position);
         line1.remove();
@@ -65,11 +86,17 @@ def main():
         line2 = plot.Circle((sys.objects[1].position[0], sys.objects[1].position[1]), 1737000, color="k");
         axes.add_artist(line1);
         axes.add_artist(line2);
+        trailx.append(sys.objects[2].position[0]);
+        traily.append(sys.objects[2].position[1]);
+        trail.set_data(trailx, traily);
+        line3.set_data((sys.objects[2].position[0], sys.objects[2].position[1]));
         #line1.xy = sys.objects[0].position;
         #line2.xy = sys.objects[1].position;
         time_text.set_text('time = %.1f' % (sys.time_elapsed()/86400) + " days");
         dist_text.set_text("distance = %.1f" % fy.dist(sys.objects[0], sys.objects[1]));
-        return line1, line2, time_text, dist_text;
+        posx_text.set_text('posx =  %.3e' % sys.objects[2].position[0])
+        posy_text.set_text('posy =  %.3e' % sys.objects[2].position[1])
+        return line1, line2, line3, time_text, dist_text, trail, posx_text, posy_text;
 
     # choose the interval based on dt and the time to animate one step
     # Take the time for one call of the animate.

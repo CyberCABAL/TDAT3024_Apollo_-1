@@ -108,19 +108,20 @@ class Ascension(object):
 
     def a_R(self, v_R, t):  #Rocket
         l = np.linalg.norm(v_R, 2);
-        if (l == 0):
+        m = saturn_v.get_mass(t);
+        if (l == 0 or m == 0):
             return 0;
-        return (v_R / l) * (saturn_v.get_force(t) / saturn_v.get_mass(t));
+        return (v_R / l) * (saturn_v.get_force(t) / m);
 
     def get_h(self, x, r_index):  #Height
         return np.linalg.norm([x[1][0] - x[1][r_index], x[2][0] - x[2][r_index]], 2) - earth_radius;
 
     def a_Atmos(self, v_R, t, h, r_index):  #Resistance
         l = np.linalg.norm(v_R, 2);
-        #print("høyde:", h, "fart: ", l, "ress: ", fy.F_d_h(0.5, h, saturn_v.get_area(t),l), "skyv: ", saturn_v.get_force(t))
-        if (l == 0):
+        m = saturn_v.get_mass(t);
+        if (l == 0 or m == 0):
             return 0;
-        return -(v_R / l) * (fy.F_d_h(0.5, h, saturn_v.get_area(t), l) / saturn_v.get_mass(t));
+        return -(v_R / l) * (fy.F_d_h(0.5, h, saturn_v.get_area(t), l) / m);
 
     def Σa(self, x, dist, r_index):
         v_R = np.array([x[3][r_index], x[4][r_index]]);
@@ -179,7 +180,7 @@ line1, = axes.plot([], [], "o-g", lw=0, ms=earth_radius/125000, label='Earth')  
 line2, = axes.plot([], [], "2-r", lw=0, ms=earth_radius/1000000, label='Rocket')  # A red rocket ship
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes)
 posx_text = axes.text(0.02, 0.90, "", transform=axes.transAxes)
-posy_text = axes.text(0.02, 0.85, "", transform=axes.transAxes)
+posy_text = axes.text(0.02, 0.80, "", transform=axes.transAxes)
 legend = axes.legend(loc='lower right')
 for legend_handle in legend.legendHandles:
     legend_handle._legmarker.set_markersize(6)
@@ -193,9 +194,9 @@ def init():
     line1.set_data([], [])
     line2.set_data([], [])
     trail.set_data([], [])
-    time_text.set_text('')
-    posx_text.set_text('')
-    posy_text.set_text('')
+    time_text.set_text("")
+    posx_text.set_text("")
+    posy_text.set_text("")
     return line1, line2, time_text, posx_text, posy_text, trail
 
 
