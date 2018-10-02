@@ -25,12 +25,12 @@ class Rocket(CelestialObject):
                  mass = 1,
                  A = 1,
                  name = "Saturn V",
-                 system_init = [0, 0, 0],
+                 #system_init = [0, 0, 0],
                  force = 1,
                  C_d = 0.5,
                  stop = False):
         CelestialObject.__init__(self, position, dirVec, mass, 1, name);
-        self.system_init = system_init;
+        #self.system_init = system_init;
         self.A = A;
         self.s_V = SaturnV();
         self.force = force;
@@ -57,7 +57,7 @@ class Rocket(CelestialObject):
         return np.linalg.norm(planet.position - self.position, 2) - planet.r;
 
     def a_Atmos(self, planet):  #Resistance
-        l = np.linalg.norm(np.array(self.dirVec) - np.array(self.system_init), 2);
+        l = np.linalg.norm(np.array(self.dirVec), 2);
         if (l == 0 or self.mass == 0):
             return np.array([0] * len(self.dirVec));
         return -(self.dirVec / l) * (F_d_h(self.C_d, self.get_h(planet), self.A, l) / self.mass);

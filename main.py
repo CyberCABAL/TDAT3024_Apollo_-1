@@ -17,9 +17,15 @@ terra_r = 6378100;
 luna_r = 1737000;
 sys = System([CelestialObject([x_0, 0.], [0., dy_0], 5.9722 * 10**24, terra_r, "Terra"),
               CelestialObject([luna_distance + x_0, 0.], [0., 1078.2 + dy_0], 7.34767309 * 10**22, luna_r, "Luna"),
-              Rocket([x_0, terra_r + 10], [0.05, 1], 2.97 * 10**6, 1, "Saturn V", [0., dy_0])
+              Rocket([x_0, terra_r + 10], [0.05, 1], 2.97 * 10**6, 1, "Saturn V")
               ], stepsize = dt, tol = tol);
 winDimention = luna_distance * 3/2;
+
+t_colour = [0.1, 0.33, 0.8];
+l_colour = [0.5, 0.47, 0.55];
+bk_colour = [0.17, 0.2, 0.3];
+tr_colour = [0.88, 0.6, 0.15];
+
 """
 p'1 = v1
 v'1 = Gm2(p2 - p1)/r**3_12
@@ -46,19 +52,20 @@ def main():
     # The figure is set
     fig = plot.figure();
     axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-winDimention, winDimention), ylim=(-winDimention, winDimention));
+    axes.set_facecolor(bk_colour);
     #line1, = axes.plot([], [], "o-b", lw=2); # Terra
     #line2, = axes.plot([], [], "o-k", lw=2); # Luna
     global line1, line2, line3, trail;
-    line1 = plot.Circle((0, 0), terra_r, color="green");
-    line2 = plot.Circle((luna_distance, 0), luna_r, color="k");
-    line3, = axes.plot([], [], "2-r", lw=0, ms=terra_r/1000000, label="Rocket")
-    trail, = axes.plot([], [], "o-b", lw=1, ms=terra_r/1000000000, label='Trail')
+    line1 = plot.Circle((0, 0), terra_r, color=t_colour);
+    line2 = plot.Circle((luna_distance, 0), luna_r, color=l_colour);
+    line3, = axes.plot([], [], "1-r", lw=0, ms=terra_r/1000000, label="Rocket")
+    trail, = axes.plot([], [], color=tr_colour, marker="o", lw=0.5, ms=terra_r/10000000000, label='Trail', alpha=0.85, ls="--")
     axes.add_artist(line1);
     axes.add_artist(line2);
-    posx_text = axes.text(0.02, 0.80, "", transform=axes.transAxes);
-    posy_text = axes.text(0.02, 0.85, "", transform=axes.transAxes);
-    time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes);
-    dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes);
+    posx_text = axes.text(0.02, 0.80, "", transform=axes.transAxes, color="w");
+    posy_text = axes.text(0.02, 0.85, "", transform=axes.transAxes, color="w");
+    time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes, color="w");
+    dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes, color="w");
 
     def init():
         #initialize animation
@@ -82,8 +89,8 @@ def main():
         line2.remove();
         del line1;
         del line2;
-        line1 = plot.Circle((sys.objects[0].position[0], sys.objects[0].position[1]), 6378100, color="g");
-        line2 = plot.Circle((sys.objects[1].position[0], sys.objects[1].position[1]), 1737000, color="k");
+        line1 = plot.Circle((sys.objects[0].position[0], sys.objects[0].position[1]), 6378100, color=t_colour);
+        line2 = plot.Circle((sys.objects[1].position[0], sys.objects[1].position[1]), 1737000, color=l_colour);
         axes.add_artist(line1);
         axes.add_artist(line2);
         trailx.append(sys.objects[2].position[0]);
