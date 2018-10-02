@@ -49,10 +49,10 @@ def main():
     #line1, = axes.plot([], [], "o-b", lw=2); # Terra
     #line2, = axes.plot([], [], "o-k", lw=2); # Luna
     global line1, line2, line3, trail;
-    line1 = plot.Circle((0, 0), terra_r, color="b");
+    line1 = plot.Circle((0, 0), terra_r, color="green");
     line2 = plot.Circle((luna_distance, 0), luna_r, color="k");
     line3, = axes.plot([], [], "2-r", lw=0, ms=terra_r/1000000, label="Rocket")
-    trail, = axes.plot([], [], "o-r", lw=1, ms=terra_r/1000000000, label='trail')
+    trail, = axes.plot([], [], "o-b", lw=1, ms=terra_r/1000000000, label='Trail')
     axes.add_artist(line1);
     axes.add_artist(line2);
     posx_text = axes.text(0.02, 0.80, "", transform=axes.transAxes);
@@ -82,7 +82,7 @@ def main():
         line2.remove();
         del line1;
         del line2;
-        line1 = plot.Circle((sys.objects[0].position[0], sys.objects[0].position[1]), 6378100, color="b");
+        line1 = plot.Circle((sys.objects[0].position[0], sys.objects[0].position[1]), 6378100, color="g");
         line2 = plot.Circle((sys.objects[1].position[0], sys.objects[1].position[1]), 1737000, color="k");
         axes.add_artist(line1);
         axes.add_artist(line2);
