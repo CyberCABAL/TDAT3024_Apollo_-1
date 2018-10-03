@@ -175,7 +175,7 @@ fig = plot.figure()
 viewsize = 5
 axes = fig.add_subplot(111, aspect="equal", autoscale_on=False, xlim=(-viewsize*earth_radius, viewsize*earth_radius), ylim=(-viewsize*earth_radius, viewsize*earth_radius))
 
-trail, = axes.plot([], [], "o-b", lw=1, ms=earth_radius/100000000, label='trail')  # A blue dotted trail
+trail, = axes.plot([], [], "o-b", lw=1, ms=earth_radius/100000000, label='Trail')  # A blue dotted trail
 line1, = axes.plot([], [], "o-g", lw=0, ms=earth_radius/125000, label='Earth')  # A blue planet
 line2, = axes.plot([], [], "2-r", lw=0, ms=earth_radius/1000000, label='Rocket')  # A red rocket ship
 time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes)
@@ -205,7 +205,7 @@ def animate(i):
     global orbit, dt, framecounter
 
     # while(orbit.time_elapsed() < framecounter/30):
-    for i in range(1):
+    for i in range(10):
         orbit.rk_safestep()
     # framecounter+= 1
 
