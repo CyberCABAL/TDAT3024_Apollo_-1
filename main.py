@@ -59,7 +59,7 @@ def main():
     line1 = plot.Circle((0, 0), terra_r, color=t_colour)
     line2 = plot.Circle((luna_distance, 0), luna_r, color=l_colour)
     line3, = axes.plot([], [], "d-w", lw=0, ms=terra_r/5000000, label="Rocket")
-    trail, = axes.plot([], [], color=tr_colour, marker="o", lw=0.5, ms=terra_r/10000000000, label='Trail', alpha=0.85, ls="--")
+    trail, = axes.plot([], [], color=tr_colour, marker="o", lw=0.5, ms=terra_r/10000000000, label="Trail", alpha=0.85, ls="--")
     axes.add_artist(line1)
     axes.add_artist(line2)
     posx_text = axes.text(0.02, 0.80, "", transform=axes.transAxes, color="w")
@@ -97,12 +97,12 @@ def main():
         traily.append(sys.objects[2].position[1])
         trail.set_data(trailx, traily)
         line3.set_data((sys.objects[2].position[0], sys.objects[2].position[1]))
-        #line1.xy = sys.objects[0].position
-        #line2.xy = sys.objects[1].position
-        time_text.set_text('time = %.1f' % (sys.time_elapsed()/86400) + " days")
-        dist_text.set_text("distance = %.1f" % fy.dist(sys.objects[0], sys.objects[1]))
-        posx_text.set_text('posx =  %.3e' % sys.objects[2].position[0])
-        posy_text.set_text('posy =  %.3e' % sys.objects[2].position[1])
+        # line1.xy = sys.objects[0].position
+        # line2.xy = sys.objects[1].position
+        time_text.set_text("time = %.1f days" % (sys.time_elapsed()/86400))
+        dist_text.set_text("elevation = %i km" % ((fy.dist(sys.objects[0], sys.objects[2])-terra_r)/1000))
+        posx_text.set_text("posx =  %.3e" % sys.objects[2].position[0])
+        posy_text.set_text("posy =  %.3e" % sys.objects[2].position[1])
         return line1, line2, line3, time_text, dist_text, trail, posx_text, posy_text
 
     # choose the interval based on dt and the time to animate one step
@@ -115,7 +115,7 @@ def main():
 
     anim=animation.FuncAnimation(fig,        # figure to plot in
                             animate,    # function that is called on each frame
-                            frames=3000, # total number of frames 
+                            frames=100000, # total number of frames
                             interval=delay, # time to wait between each frame.
                             repeat=False,
                             blit=False,
@@ -127,7 +127,7 @@ def main():
     # the video can be embedded in html5.  You may need to adjust this for
     # your system: for more information, see
     # http://matplotlib.sourceforge.net/api/animation_api.html
-    #anim.save('orbit.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+    #anim.save("orbit.mp4", fps=30, extra_args=["-vcodec", "libx264"])
 
     plot.show()
     
