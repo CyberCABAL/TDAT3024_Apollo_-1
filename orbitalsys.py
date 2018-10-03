@@ -187,12 +187,10 @@ class System:
         return w, sum(e)/len(e);    #Uncertain about this.
 
     def step(self, rate = 3):
-        W, E = self.rk_safestep();
-        self.updateState(W);
-        for i in range(rate - 1):
+        for i in range(rate):
             W, E = self.rk_safestep();
             self.updateState(W);
-        self.stateToObjects();
+            self.stateToObjects();
         if (self.r_index):
             if (self.objects[self.r_index].stop):
                 self.objects[self.r_index].update(self.time_elapsed());

@@ -50,7 +50,7 @@ class SaturnV(object):
                  step_mass_without_fuel=[130 * 10 ** 3, 40.1 * 10 ** 3, 13.5 * 10 ** 3],
                  step_force=[35100 * 10 ** 3, 5141 * 10 ** 3, 1000 * 10 ** 3],
                  step_time=[168, 360, 500],
-                 step_diameter=[10.1, 10.1, 6.6, 3.9]):
+                 step_diameter=[10.1, 10.1, 6.6]):
         self.mass = total_mass
         self.step_mass = step_total_mass
         self.step_mass_without_fuel = step_mass_without_fuel
@@ -103,68 +103,48 @@ class SaturnV(object):
 
     def get_step_start_mass(self, x):
         # Finner totalmassen til raketten rett før hver trinn tennes
-        if 0 <= x < 3:
-            if x == 0:
-                return self.mass
-            if x == 1:
-                return self.mass - self.step_mass[0]
-            else:
-                return self.mass - self.step_mass[0] - self.step_mass[1]
+        tempmass=self.mass
+        for step in range (len(self.step_time)):
+            if x==step:
+                return tempmass
+            tempmass -= self.step_mass[step]
             
     def get_mass(self, t):
         # En funksjon m(t) som gir massen til raketten ved tiden t sekunder etter oppskytingen
-        if 0 <= t <= (self.step_time[0]+self.step_time[1]+self.step_time[2]):
-            if t <= self.step_time[0]:
-                return self.get_step_start_mass(0) + self.get_mass_difference(0) * t
-            if self.step_time[0] < t <= (self.step_time[0]+self.step_time[1]):
-                st = t-self.step_time[0]
-                return self.get_step_start_mass(1) + self.get_mass_difference(1) * st
-            else:
-                st = t-self.step_time[0]-self.step_time[1]
-                return self.get_step_start_mass(2) + self.get_mass_difference(2) * st
-        else:
-            if t > (self.step_time[0]+self.step_time[1]+self.step_time[2]):
-                return self.mass - self.step_mass[0] - self.step_mass[1] - self.step_mass[2]
-            else:
-                raise ValueError('velg en t i intervallet [0,->]')
-
+        st = t;
+        steptime=self.step_time[0]
+        for step in range(len(self.step_time)):
+            if t <= steptime:
+                return self.get_step_start_mass(step) + self.get_mass_difference(step) * st
+            st -= self.step_time[step]
+            steptime += self.step_time[step+1] if len(self.step_time) > step + 1 else 0
+        return self.mass - sum(self.step_mass)
+        
     def get_force(self, t):
         # En funksjon som gir skyvekraften til raketten ved tiden t sekunder etter oppskytingen.
         # Siden vi antar at skyvekraften er konstant i hvert steg, så sjekker metoden bare hvilket steg det er snakk om
-        if 0 <= t <= (self.step_time[0]+self.step_time[1]+self.step_time[2]):
-            if t <= self.step_time[0]:
-                return self.step_force[0]
-            if self.step_time[0] < t <= (self.step_time[0]+self.step_time[1]):
-                return self.step_force[1]
-            else:
-                return self.step_force[2]
-        else:
-            if t > (self.step_time[0]+self.step_time[1]+self.step_time[2]):
-                return 0
-            else:
-                raise ValueError('Velg en t i intervallet [0, ->]')
+        steptime=self.step_time[0]
+        for step in range(len(self.step_time)):
+            if t <= steptime:
+                return self.step_force[step]
+            steptime += self.step_time[step+1] if len(self.step_time) > step + 1 else 0
+        return 0
 
     def get_area(self, t):
         # Denne funksjonen ble lagt til med tanke på atmosfæren i oppgave 6.
         # Den returnerer arealet til raketten etter t sekunder.
-        if 0 <= t <= (self.step_time[0]+self.step_time[1]+self.step_time[2]):
-            if t <= self.step_time[0]:
-                return (((self.step_diameter[0]/2)**2)*math.pi)
-            if self.step_time[0] < t <= (self.step_time[0]+self.step_time[1]):
-                return (((self.step_diameter[1]/2)**2)*math.pi)
-            else:
-                return (((self.step_diameter[2]/2)**2)*math.pi)
-        else:
-            if t > (self.step_time[0]+self.step_time[1]+self.step_time[2]):
-                return (((self.step_diameter[3]/2)**2)*math.pi)
-            else:
-                raise ValueError('Velg en t i intervallet [0, ->]')
-
+        steptime=self.step_time[0]
+        for step in range(len(self.step_time)):
+            if t <= steptime:
+                return (((self.step_diameter[step]/2)**2)*math.pi)
+            steptime += self.step_time[step+1] if len(self.step_time) > step + 1 else 0
+        return (((3.9/2)**2)*math.pi) #area of comando module
+    
 def main():
     saturn_v = SaturnV()
     saturn_v.saturn_v_info()
-    #print(saturn_v.get_mass(170)
-    
+    #print(saturn_v.get_area(1100))
+
     print("\nTotalmasse i starten av steg 1: ",saturn_v.get_step_start_mass(0), "kg")
     print("\nTotalmasse i starten av steg 2: ",saturn_v.get_step_start_mass(1), "kg")
     print("\nTotalmasse i starten av steg 3: ",saturn_v.get_step_start_mass(2), "kg")
