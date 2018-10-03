@@ -48,8 +48,7 @@ class SaturnV(object):
                  total_mass=2970 * 10 ** 3,
                  step_total_mass=[2290 * 10 ** 3, 496.2 * 10 ** 3, 123 * 10 ** 3],
                  step_mass_without_fuel=[130 * 10 ** 3, 40.1 * 10 ** 3, 13.5 * 10 ** 3],
-                 # step_force=[35100 * 10 ** 3, 5141 * 10 ** 3, 1000 * 10 ** 3],  # Original step forces
-                 step_force=[38100 * 10 ** 3, 8141 * 10 ** 3, 1000 * 10 ** 3],  # Step forces to hit the moon
+                 step_force=[35100 * 10 ** 3, 5141 * 10 ** 3, 1000 * 10 ** 3],
                  step_time=[168, 360, 500],
                  step_diameter=[10.1, 10.1, 6.6, 3.9]):
         self.mass = total_mass
