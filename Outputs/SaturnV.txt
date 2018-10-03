@@ -1,0 +1,72 @@
+Saturn V info:
+Totalvekt:  2970000  kg
+
+
+Steg:  1
+Totalvekt:  2290000  kg
+Vekt uten drivstoff:  130000  kg
+Drivstoff i kg:  2160000  kg
+Varighet i s:  168  s
+Masseendring:  -12857.14  kg/s
+Hastighet:  2730.0  m/s
+Skyvekraft:  35100000  N
+
+
+Steg:  2
+Totalvekt:  496200.0  kg
+Vekt uten drivstoff:  40100.0  kg
+Drivstoff i kg:  456100.0  kg
+Varighet i s:  360  s
+Masseendring:  -1266.94  kg/s
+Hastighet:  4057.79  m/s
+Skyvekraft:  5141000  N
+
+
+Steg:  3
+Totalvekt:  123000  kg
+Vekt uten drivstoff:  13500.0  kg
+Drivstoff i kg:  109500.0  kg
+Varighet i s:  500  s
+Masseendring:  -219.0  kg/s
+Hastighet:  4566.21  m/s
+Skyvekraft:  1000000  N
+
+Totalmasse i starten av steg 1:  2970000 kg
+
+Totalmasse i starten av steg 2:  680000 kg
+
+Totalmasse i starten av steg 3:  183800.0 kg
+
+Masse ved ulike t-verdier
+Steg 1:
+t: 0 s  masse: 2970000.0 kg
+t: 50 s         masse: 2327143.0 kg
+t: 100 s        masse: 1684286.0 kg
+t: 150 s        masse: 1041429.0 kg
+t: 168 s        masse: 810000.0 kg
+
+Steg 2:
+t: 168.1 s      masse: 679873.0 kg
+t: 200 s        masse: 639458.0 kg
+t: 250 s        masse: 576111.0 kg
+t: 300 s        masse: 512763.0 kg
+t: 350 s        masse: 449416.0 kg
+t: 400 s        masse: 386069.0 kg
+t: 450 s        masse: 322722.0 kg
+t: 500 s        masse: 259374.0 kg
+t: 528 s        masse: 223900.0 kg
+
+Steg 3:
+t: 528.1 s      masse: 183778.0 kg
+t: 550 s        masse: 178982.0 kg
+t: 600 s        masse: 168032.0 kg
+t: 650 s        masse: 157082.0 kg
+t: 700 s        masse: 146132.0 kg
+t: 750 s        masse: 135182.0 kg
+t: 800 s        masse: 124232.0 kg
+t: 850 s        masse: 113282.0 kg
+t: 900 s        masse: 102332.0 kg
+t: 950 s        masse: 91382.0 kg
+t: 1000 s       masse: 80432.0 kg
+t: 1028 s       masse: 74300.0 kg
+t: 1028.1 s     masse: 60800.0 kg

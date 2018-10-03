@@ -88,6 +88,13 @@ def F(Y):
     res = np.ones(3);
     res[1:3] = M.dot(Y[1:3]);
     return res;
+
+def y_1(t):
+    return m.e**t * m.cos(t);
+
+def y_2(t):
+    return -m.e**t * m.sin(t);
+
 def F_test(Y):
     M = np.array([[0.49119653, 0.32513304, 0.98057799],
                 [0.20768544, 0.97699416, 0.18220559],
@@ -96,11 +103,6 @@ def F_test(Y):
     res[1:4] = M.dot(Y[1:4]);
     return res;
 
-def y_1(t):
-    return m.e**t * m.cos(t);
-
-def y_2(t):
-    return -m.e**t * m.sin(t);
 
 def main():
     """ 6.3.1.a

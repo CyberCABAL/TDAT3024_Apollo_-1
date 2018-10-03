@@ -85,13 +85,13 @@ class RungeKuttaFehlberg54:
         self.h = step_length        
  
         
-"""def F(Y):
+def F(Y):
     M = np.array([[0.49119653, 0.32513304, 0.98057799],
                 [0.20768544, 0.97699416, 0.18220559],
                 [0.96407071, 0.18373237, 0.95307793]])
     res = np.ones(4)
     res[0:3] = M.dot(Y[0:3])
-    return res"""
+    return res
 
 
 def func(y):
@@ -108,6 +108,32 @@ def y_1(t):
 def y_2(t):
     return -m.e**t * m.sin(t)
 
+def test():
+    """ 6.3.1.a
+          h = 0.25, [0,1]
+          y'1 = y_1 + y_2
+          y'2 = −y_1 + y_2
+          y_1(0) = 1
+          y_2(0) = 0
+
+          y_1(t) = e**t * cos(t), y_2(t) = -e**t * sin(t)
+          """
+
+    W = np.array([0, 1, 0]);
+    E = 0;
+    h = 0.25;
+    tol = 05e-14;
+    tEnd = 1.0;
+
+    rkf54 = RungeKuttaFehlberg54(func, 3, h, tol);
+    while (W[0] < tEnd):
+        W, E = rkf54.safe_step(W);
+
+    rkf54.set_step_length(tEnd - W[0]);
+    W, E = rkf54.step(W);
+
+    print(W, E);
+    print("Total error: ", [abs(W[1] - y_1(1)), abs(W[2] - y_2(1))])
 
 def main(tolerance):
     """ 6.3.1.a
@@ -134,10 +160,8 @@ def main(tolerance):
     result = [w[1], w[2]]
     total_error = [abs(w[1] - y_1(1)), abs(w[2] - y_2(1))]
     return result, total_error
-    
-    
-if __name__ == "__main__":
-    # execute only if run as a script
+
+def tidplot():
     data = [
         [],  # Tolerance
         [],  # Runtime
@@ -146,11 +170,11 @@ if __name__ == "__main__":
     ]
 
     for i in range(4, 20):
-        tolerance = 10**-i
+        tolerance = 10 ** -i
         t1 = time.time()
         result, total_error = main(tolerance)
         t2 = time.time()
-        runtime = t2-t1
+        runtime = t2 - t1
         data[0].append(tolerance)
         data[1].append(runtime)
         data[2].append(result)
@@ -174,3 +198,8 @@ if __name__ == "__main__":
     plt.xscale("log")
     plt.grid(True)
     plt.show()
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    test()
+    tidplot()
