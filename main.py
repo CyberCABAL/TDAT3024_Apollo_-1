@@ -18,7 +18,7 @@ luna_r = 1737000;
 sys = System([CelestialObject([x_0, 0.], [0., dy_0], 5.9722 * 10**24, terra_r, "Terra"),
               CelestialObject([luna_distance + x_0, 0.], [0., 1078.2 + dy_0], 7.34767309 * 10**22, luna_r, "Luna"),
               Rocket([x_0, terra_r + 10], [0.05, 1], 2.97 * 10**6, 1, "Saturn V")
-              ], stepsize = dt, tol = tol);
+              ], stepsize = dt, tol = tol, r_index = 2);
 winDimention = luna_distance * 3/2;
 
 t_colour = [0.1, 0.33, 0.8];

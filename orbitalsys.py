@@ -6,11 +6,13 @@ import math
 import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 
+crash_index = None;
+
 class System:
     
     def __init__(self,
                 objects,
-                 G = 6.67408 * 10**(-11), t = 0, stepsize = 0.25, tol = 0.0001):
+                G = 6.67408 * 10**(-11), t = 0, stepsize = 0.25, tol = 0.0001, r_index = None):
         self.GravConst = G;
         self.objects = objects;
         self.objLen = len(objects);
@@ -18,6 +20,7 @@ class System:
         self.time_dim = 1    #max(len(objects[0].position), len(objects));
         self.h = stepsize;
         self.tol = tol;
+        self.r_index = r_index;
 
         #print("dim:", self.dim);
         
@@ -60,9 +63,7 @@ class System:
 
     def __tempSum(self, x, n, m):
         sum0 = 0;
-        #print(x)
         for i in range(self.time_dim, self.dim + self.time_dim):
-            #print(n, m, x[i][n], x[i][m]);
             temp = x[i][m] - x[i][n];
             sum0 += temp * temp;
         return sum0;
@@ -74,34 +75,39 @@ class System:
         result = [];
         for n in range(self.objLen):
             tempSum = 0;
-            for m in range(self.objLen):
-                #if (n != m and dist[n][m] != 0):
-                #    tempSum += (Gm[m] * (p[m] - p[n])) / (dist3[n][m]);
-                if (n != m and dist[n][m] > self.objects[m].r):
-                    tempSum += (Gm[m] * (p[m] - p[n])) / (dist3[n][m]);
-                elif n != m and dist[n][m] < self.objects[m].r and n == r_index:
-                    # Object n has crashed into object m. Velocity is removed.
-                    self.objects[r_index].stop = True;
-                    #print("Crash!");
+            if (not self.objects[n].stop):
+                for m in range(self.objLen):
+                    if (not self.objects[m].stop):
+                        if (n != m and dist[n][m] > self.objects[m].r):
+                            tempSum += (Gm[m] * (p[m] - p[n])) / (dist3[n][m]);
+                        elif n != m and dist[n][m] < self.objects[m].r and n == r_index:
+                            # Object n has crashed into object m. Velocity is removed.
+                            self.objects[r_index].stop = True;
+                            print("Crashed into", self.objects[m].name, "!");
+                            global crash_index;
+                            crash_index = m;
             result.append(tempSum);
         return np.array(result);
 
     def Σa(self, x, dist, r_index):
-        rocket = self.objects[r_index];
         Gm = np.array([o.mass for o in self.objects]) * self.GravConst;
         dist3 = [[dist[n][m] ** 3 for m in range(self.objLen)] for n in range(self.objLen)];
 
+        if (r_index):
+            rocket = self.objects[r_index];
         a = [self.a_G(x[i], dist, dist3, Gm, r_index) for i in range(self.time_dim, self.time_dim + self.dim)];
-        a_R = rocket.a_R();
-        a_A = rocket.a_Atmos(self.objects[0]);
-        #print(a_R, a_A)
-        for i in range(self.dim):
-            a[i][r_index] += a_R[i] + a_A[i];
+        if (r_index):
+            if (not rocket.stop):
+                a_R = rocket.a_R();
+                a_A = rocket.a_Atmos(self.objects[0]);
+                for i in range(self.dim):
+                    a[i][r_index] += a_R[i] + a_A[i];
         return a;
 
     def ydot(self, x):
-        r_index = 2;
-        self.objects[r_index].update(self.time_elapsed());
+        index = self.r_index;
+        if (index):
+            self.objects[index].update(self.time_elapsed());
         #Gm = np.array([o.mass for o in self.objects]) * self.GravConst;
         dist = self.distPos(x);
         #print(dist)
@@ -110,10 +116,16 @@ class System:
         res = [np.ones(self.time_dim)];
         for i in range(-self.dim, 0):
             res.append(x[i]);
-        Σ = self.Σa(x, dist, r_index);
+        Σ = self.Σa(x, dist, index);
         for i in range(self.dim):
             res.append(Σ[i]);
-        
+
+        if (index):
+            if (self.objects[index].stop):
+                for i in range(-self.dim, 0):
+                    res[i][index] = 0;
+                for i in range(self.time_dim, self.time_dim + self.dim):
+                    res[i][index] = res[i][crash_index];
         return np.array(res);
         #return np.array([np.ones(self.dim), x[3], x[4], self.force(x[1], dist, Gm), self.force(x[2], dist, Gm)]);
 
@@ -181,5 +193,8 @@ class System:
             W, E = self.rk_safestep();
             self.updateState(W);
         self.stateToObjects();
+        if (self.r_index):
+            if (self.objects[self.r_index].stop):
+                self.objects[self.r_index].update(self.time_elapsed());
         return W, E;
                           

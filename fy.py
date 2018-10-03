@@ -17,6 +17,7 @@ class CelestialObject:
         self.position = np.array(position)
         self.dirVec = np.array(dirVec)
         self.name = name
+        self.stop = False;
 
 class Rocket(CelestialObject):
     def __init__(self,
@@ -43,11 +44,13 @@ class Rocket(CelestialObject):
             self.A = self.s_V.get_area(t);
             self.force = self.s_V.get_force(t);
         else:
-            self.mass = 0;
+            #self.mass = 0;
             self.force = 0;
             self.dirVec = [0] * len(self.dirVec);
 
     def a_R(self):
+        if (self.stop):
+            return np.array([0] * len(self.dirVec));
         l = np.linalg.norm(self.dirVec, 2);
         if (l == 0 or self.mass == 0):
             return np.array([0] * len(self.dirVec));
@@ -57,6 +60,8 @@ class Rocket(CelestialObject):
         return np.linalg.norm(planet.position - self.position, 2) - planet.r;
 
     def a_Atmos(self, planet):  #Resistance
+        if (self.stop):
+            return np.array([0] * len(self.dirVec));
         l = np.linalg.norm(np.array(self.dirVec), 2);
         if (l == 0 or self.mass == 0):
             return np.array([0] * len(self.dirVec));
