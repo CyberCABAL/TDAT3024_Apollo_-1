@@ -1,7 +1,6 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from SaturnV import SaturnV
 
 G = 6.67408 * 10**(-11)
 
@@ -29,11 +28,12 @@ class Rocket(CelestialObject):
                  #system_init = [0, 0, 0],
                  force = 1,
                  C_d = 0.5,
-                 stop = False):
+                 stop = False,
+                 saturn_v = None):
         CelestialObject.__init__(self, position, dirVec, mass, 1, name);
         #self.system_init = system_init;
         self.A = A;
-        self.s_V = SaturnV();
+        self.s_V = saturn_v;
         self.force = force;
         self.C_d = C_d;
         self.stop = stop;

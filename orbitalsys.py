@@ -184,7 +184,7 @@ class System:
         #z[0] = np.array([z[0][0]]);
         #print(w, z)
 
-        return w, sum(e)/len(e)    #Uncertain about this.
+        return w, sum(e)/len(e);    #Uncertain about this.
 
     def step(self, rate = 3):
         W, E = self.rk_safestep();
