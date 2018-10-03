@@ -62,10 +62,11 @@ def main():
     trail, = axes.plot([], [], color=tr_colour, marker="o", lw=0.5, ms=terra_r/10000000000, label="Trail", alpha=0.85, ls="--")
     axes.add_artist(line1)
     axes.add_artist(line2)
-    posx_text = axes.text(0.02, 0.80, "", transform=axes.transAxes, color="w")
-    posy_text = axes.text(0.02, 0.85, "", transform=axes.transAxes, color="w")
+    posx_text = axes.text(0.02, 0.75, "", transform=axes.transAxes, color="w")
+    posy_text = axes.text(0.02, 0.80, "", transform=axes.transAxes, color="w")
     time_text = axes.text(0.02, 0.95, "", transform=axes.transAxes, color="w")
     dist_text = axes.text(0.02, 0.90, "", transform=axes.transAxes, color="w")
+    dist_moon_text = axes.text(0.02, 0.85, "", transform=axes.transAxes, color="w")
 
     def init():
         #initialize animation
@@ -74,10 +75,11 @@ def main():
         line3.set_data([], [])
         time_text.set_text("")
         dist_text.set_text("")
+        dist_moon_text.set_text("")
         posx_text.set_text("")
         posy_text.set_text("")
         trail.set_data([], [])
-        return line1, line2, line3, time_text, dist_text, trail, posx_text, posy_text
+        return line1, line2, line3, time_text, dist_text, dist_moon_text, trail, posx_text, posy_text
 
     def animate(i):
         #perform animation step
@@ -101,9 +103,10 @@ def main():
         # line2.xy = sys.objects[1].position
         time_text.set_text("time = %.1f days" % (sys.time_elapsed()/86400))
         dist_text.set_text("elevation = %i km" % ((fy.dist(sys.objects[0], sys.objects[2])-terra_r)/1000))
+        dist_moon_text.set_text("dist. to moon = %i km" % ((fy.dist(sys.objects[1], sys.objects[2])-luna_r)/1000))
         posx_text.set_text("posx =  %.3e" % sys.objects[2].position[0])
         posy_text.set_text("posy =  %.3e" % sys.objects[2].position[1])
-        return line1, line2, line3, time_text, dist_text, trail, posx_text, posy_text
+        return line1, line2, line3, time_text, dist_text, dist_moon_text, trail, posx_text, posy_text
 
     # choose the interval based on dt and the time to animate one step
     # Take the time for one call of the animate.
